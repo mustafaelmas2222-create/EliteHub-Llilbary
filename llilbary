@@ -105,7 +105,7 @@ function EliteHub:CreateWindow(Settings)
     Title.Name = "Title"
     Title.Parent = Header
     Title.Position = UDim2.new(0, 22, 0.5, -13)
-    Title.Size = UDim2.new(0, 250, 0, 26)
+    Title.Size = UDim2.new(0, 200, 0, 26)
     Title.BackgroundTransparency = 1
     Title.Font = Enum.Font.GothamBlack
     Title.Text = string.upper(WindowName)
