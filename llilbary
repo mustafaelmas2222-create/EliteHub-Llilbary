@@ -1,6 +1,6 @@
 -- ========================================================
--- ELITE HUB - Modern UI Library
--- Rayfield Tarzı Modüler Kütüphane Mimarisi
+-- ELITE HUB - Modern UI Library with Integrated AI Assistant
+-- Sağ Üst AI Butonlu ve Otomatik Çalıştırma Destekli Sürüm
 -- ========================================================
 
 local EliteHub = {}
@@ -11,6 +11,7 @@ local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 local CoreGui = game:GetService("CoreGui")
+local HttpService = game:GetService("HttpService")
 
 local LocalPlayer = Players.LocalPlayer
 
@@ -105,7 +106,7 @@ function EliteHub:CreateWindow(Settings)
     Title.Name = "Title"
     Title.Parent = Header
     Title.Position = UDim2.new(0, 22, 0.5, -13)
-    Title.Size = UDim2.new(0, 200, 0, 26)
+    Title.Size = UDim2.new(0, 180, 0, 26)
     Title.BackgroundTransparency = 1
     Title.Font = Enum.Font.GothamBlack
     Title.Text = string.upper(WindowName)
@@ -145,6 +146,37 @@ function EliteHub:CreateWindow(Settings)
         closeTween:Play()
         closeTween.Completed:Wait()
         ScreenGui:Destroy()
+    end)
+
+    -- Sağ Üst AI Açma Butonu
+    local AIToggleBtn = Instance.new("TextButton")
+    AIToggleBtn.Name = "AIToggleBtn"
+    AIToggleBtn.Parent = Header
+    AIToggleBtn.Position = UDim2.new(1, -76, 0.5, -13)
+    AIToggleBtn.Size = UDim2.new(0, 28, 0, 26)
+    AIToggleBtn.BackgroundColor3 = Color3.fromRGB(48, 26, 75)
+    AIToggleBtn.BackgroundTransparency = 0.3
+    AIToggleBtn.Font = Enum.Font.GothamBold
+    AIToggleBtn.Text = "AI"
+    AIToggleBtn.TextColor3 = Color3.fromRGB(210, 185, 255)
+    AIToggleBtn.TextSize = 12
+    AIToggleBtn.AutoButtonColor = false
+
+    local AIBtnCorner = Instance.new("UICorner")
+    AIBtnCorner.CornerRadius = UDim.new(0, 6)
+    AIBtnCorner.Parent = AIToggleBtn
+
+    local AIBtnStroke = Instance.new("UIStroke")
+    AIBtnStroke.Parent = AIToggleBtn
+    AIBtnStroke.Color = Color3.fromRGB(160, 85, 235)
+    AIBtnStroke.Thickness = 1
+    AIBtnStroke.Transparency = 0.5
+
+    AIToggleBtn.MouseEnter:Connect(function()
+        TweenService:Create(AIToggleBtn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(160, 85, 235), TextColor3 = Color3.fromRGB(255, 255, 255)}):Play()
+    end)
+    AIToggleBtn.MouseLeave:Connect(function()
+        TweenService:Create(AIToggleBtn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(48, 26, 75), TextColor3 = Color3.fromRGB(210, 185, 255)}):Play()
     end)
 
     -- Sürükleme Mantığı (Smooth Lerp + Modal)
@@ -191,7 +223,7 @@ function EliteHub:CreateWindow(Settings)
         end
     end)
 
-    -- Sekme ve Buton Kapsayıcısı (ScrollingFrame)
+    -- Normal İçerik Kapsayıcısı (ScrollingFrame)
     local Container = Instance.new("ScrollingFrame")
     Container.Name = "Container"
     Container.Parent = Content
@@ -211,6 +243,191 @@ function EliteHub:CreateWindow(Settings)
     UIGrid:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
         Container.CanvasSize = UDim2.new(0, 0, 0, UIGrid.AbsoluteContentSize.Y + 10)
     end)
+
+    -- --- AYRI AI SOHBET MENÜSÜ (PENCERE İÇİNDE AÇILAN PANEL) ---
+    local AIChatFrame = Instance.new("Frame")
+    AIChatFrame.Name = "AIChatFrame"
+    AIChatFrame.Parent = Content
+    AIChatFrame.Position = UDim2.new(0, 22, 0, 56)
+    AIChatFrame.Size = UDim2.new(1, -44, 0, 185)
+    AIChatFrame.BackgroundColor3 = Color3.fromRGB(18, 12, 28)
+    AIChatFrame.BackgroundTransparency = 0.1
+    AIChatFrame.Visible = false
+    AIChatFrame.ZIndex = 5
+
+    local AIChatCorner = Instance.new("UICorner")
+    AIChatCorner.CornerRadius = UDim.new(0, 12)
+    AIChatCorner.Parent = AIChatFrame
+
+    local AIChatStroke = Instance.new("UIStroke")
+    AIChatStroke.Parent = AIChatFrame
+    AIChatStroke.Color = Color3.fromRGB(160, 85, 235)
+    AIChatStroke.Thickness = 1.2
+    AIChatStroke.Transparency = 0.3
+
+    -- Sohbet Geçmişi Kaydırma Alanı
+    local ChatScroll = Instance.new("ScrollingFrame")
+    ChatScroll.Name = "ChatScroll"
+    ChatScroll.Parent = AIChatFrame
+    ChatScroll.Position = UDim2.new(0, 8, 0, 8)
+    ChatScroll.Size = UDim2.new(1, -16, 1, -52)
+    ChatScroll.BackgroundTransparency = 1
+    ChatScroll.ScrollBarThickness = 2
+    ChatScroll.ScrollBarImageColor3 = Color3.fromRGB(160, 85, 235)
+    ChatScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
+    ChatScroll.BorderSizePixel = 0
+
+    local ChatList = Instance.new("UIListLayout")
+    ChatList.Parent = ChatScroll
+    ChatList.SortOrder = Enum.SortOrder.LayoutOrder
+    ChatList.Padding = UDim.new(0, 6)
+
+    ChatList:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+        ChatScroll.CanvasSize = UDim2.new(0, 0, 0, ChatList.AbsoluteContentSize.Y + 10)
+        ChatScroll.CanvasPosition = Vector2.new(0, ChatList.AbsoluteContentSize.Y)
+    end)
+
+    local function AddMessage(sender, text, isUser)
+        local msgContainer = Instance.new("Frame")
+        msgContainer.Parent = ChatScroll
+        msgContainer.Size = UDim2.new(1, 0, 0, 0)
+        msgContainer.AutomaticSize = Enum.AutomaticSize.Y
+        msgContainer.BackgroundTransparency = 1
+
+        local bubble = Instance.new("TextLabel")
+        bubble.Parent = msgContainer
+        bubble.Size = UDim2.new(0.92, 0, 0, 0)
+        bubble.AutomaticSize = Enum.AutomaticSize.Y
+        bubble.Position = isUser and UDim2.new(0.08, 0, 0, 0) or UDim2.new(0, 0, 0, 0)
+        bubble.BackgroundColor3 = isUser and Color3.fromRGB(48, 26, 75) or Color3.fromRGB(12, 8, 18)
+        bubble.BackgroundTransparency = 0.2
+        bubble.Font = Enum.Font.Gotham
+        bubble.Text = "<b>" .. sender .. ":</b>\n" .. text
+        bubble.TextColor3 = Color3.fromRGB(235, 225, 255)
+        bubble.TextSize = 11
+        bubble.TextWrapped = true
+        bubble.RichText = true
+        bubble.TextXAlignment = Enum.TextXAlignment.Left
+
+        local bubbleCorner = Instance.new("UICorner")
+        bubbleCorner.CornerRadius = UDim.new(0, 6)
+        bubbleCorner.Parent = bubble
+
+        local padding = Instance.new("UIPadding")
+        padding.Parent = bubble
+        padding.PaddingTop = UDim.new(0, 6)
+        padding.PaddingBottom = UDim.new(0, 6)
+        padding.PaddingLeft = UDim.new(0, 8)
+        padding.PaddingRight = UDim.new(0, 8)
+    end
+
+    AddMessage("Elite AI", "Selam! Yapay zeka aktif. Kod yanıtları otomatik çalıştırılır.", false)
+
+    -- Alt Mesaj Giriş Alanı
+    local AIInputBox = Instance.new("TextBox")
+AIInputBox.Name = "AIInputBox"
+    AIInputBox.Parent = AIChatFrame
+    AIInputBox.Position = UDim2.new(0, 8, 1, -38)
+    AIInputBox.Size = UDim2.new(0.74, -4, 0, 30)
+    AIInputBox.BackgroundColor3 = Color3.fromRGB(12, 8, 18)
+    AIInputBox.BackgroundTransparency = 0.5
+    AIInputBox.Font = Enum.Font.GothamMedium
+    AIInputBox.PlaceholderText = "Yapay zekaya sor..."
+    AIInputBox.Text = ""
+    AIInputBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+    AIInputBox.TextSize = 11
+    AIInputBox.ClearTextOnFocus = false
+
+    local AIInputCorner = Instance.new("UICorner")
+    AIInputCorner.CornerRadius = UDim.new(0, 6)
+    AIInputCorner.Parent = AIInputBox
+
+    local AISendBtn = Instance.new("TextButton")
+    AISendBtn.Name = "AISendBtn"
+    AISendBtn.Parent = AIChatFrame
+    AISendBtn.Position = UDim2.new(0.76, 0, 1, -38)
+    AISendBtn.Size = UDim2.new(0.24, -4, 0, 30)
+    AISendBtn.BackgroundColor3 = Color3.fromRGB(160, 85, 235)
+    AISendBtn.BackgroundTransparency = 0.2
+    AISendBtn.Font = Enum.Font.GothamBold
+    AISendBtn.Text = "Gönder"
+    AISendBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    AISendBtn.TextSize = 11
+    AISendBtn.AutoButtonColor = false
+
+    local AISendCorner = Instance.new("UICorner")
+    AISendCorner.CornerRadius = UDim.new(0, 6)
+    AISendCorner.Parent = AISendBtn
+
+    -- AI Menüsünü Açıp Kapatma Mantığı
+    local aiOpen = false
+    AIToggleBtn.MouseButton1Click:Connect(function()
+        aiOpen = not aiOpen
+        AIChatFrame.Visible = aiOpen
+        Container.Visible = not aiOpen
+        AIToggleBtn.TextColor3 = aiOpen and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(210, 185, 255)
+    end)
+
+    -- Mesaj Gönderme ve API İstek Mantığı
+    AISendBtn.MouseButton1Click:Connect(function()
+        local userMessage = AIInputBox.Text
+        if userMessage == "" then return end
+
+        AddMessage("Sen", userMessage, true)
+        AIInputBox.Text = ""
+        AISendBtn.Active = false
+
+        task.spawn(function()
+            local requestBody = {
+                language = "Luau",
+                task = "write",
+                prompt = "Eğer bir kod yazman gerekiyorsa, kesinlikle başı '[( ' ve sonu ' )]' olacak şekilde bu işaretlerin arasına koy. Normal metinlerde kullanma. İstek: " .. userMessage,
+                history = {}
+            }
+
+            local success, response = pcall(function()
+                return HttpService:RequestAsync({
+                    Url = "https://8328-iaegwjno6hih212t36m6p-3442aba1.us3.manus.computer/api/chat",
+                    Method = "POST",
+                    Headers = { ["Content-Type"] = "application/json" },
+                    Body = HttpService:JSONEncode(requestBody),
+                })
+            end)
+
+            if success and response and response.Success then
+                local decodedSuccess, decodedBody = pcall(function()
+                    return HttpService:JSONDecode(response.Body)
+                end)
+                
+                if decodedSuccess and decodedBody and decodedBody.answer then
+                    local aiReply = tostring(decodedBody.answer)
+                    AddMessage("Elite AI", aiReply, false)
+
+                    -- [( ve )] arasındaki kodu otomatik çalıştır
+                    local extractedCode = aiReply:match("%[%((.-)%)]")
+                    if extractedCode then
+                        local func, err = loadstring(extractedCode)
+                        if func then
+                            local runSuccess, runErr = pcall(func)
+                            if runSuccess then
+                                AddMessage("Sistem", "✔ Kod başarıyla çalıştırıldı!", false)
+                            else
+                                AddMessage("Sistem", "❌ Çalıştırma Hatası: " .. tostring(runErr), false)
+                            end
+                        else
+                            AddMessage("Sistem", "❌ Syntax Hatası: " .. tostring(err), false)
+                        end
+                    end
+                else
+                    AddMessage("Elite AI", "Hata: Yanıt şemasında 'answer' bulunamadı.", false)
+                end
+            else
+                AddMessage("Elite AI", "Bağlantı hatası oluştu!", false)
+            end
+            AISendBtn.Active = true
+        end)
+    end)
+    --------------------------------------------------------
 
     -- Profil Alt Şeridi
     local UserFooter = Instance.new("Frame")
