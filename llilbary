@@ -1,6 +1,6 @@
 -- ========================================================
--- ELITE HUB - Modern UI Library with Integrated AI Assistant
--- Sağ Üst AI Butonlu ve Otomatik Çalıştırma Destekli Sürüm
+-- ELITE HUB - Modern UI Library with Side-by-Side AI Panel
+-- Yan Yana Açılan Yan Panel & Şık AI Tasarımı
 -- ========================================================
 
 local EliteHub = {}
@@ -88,7 +88,7 @@ function EliteHub:CreateWindow(Settings)
     Content.Parent = Main
     Content.Size = UDim2.new(1, 0, 1, 0)
     Content.BackgroundTransparency = 1
-    Content.ClipsDescendants = true
+    Content.ClipsDescendants = false
     Content.ZIndex = 2
 
     local ContentCorner = Instance.new("UICorner")
@@ -148,35 +148,35 @@ function EliteHub:CreateWindow(Settings)
         ScreenGui:Destroy()
     end)
 
-    -- Sağ Üst AI Açma Butonu
+    -- Sağ Üst Şık AI Açma Butonu
     local AIToggleBtn = Instance.new("TextButton")
     AIToggleBtn.Name = "AIToggleBtn"
     AIToggleBtn.Parent = Header
-    AIToggleBtn.Position = UDim2.new(1, -76, 0.5, -13)
-    AIToggleBtn.Size = UDim2.new(0, 28, 0, 26)
-    AIToggleBtn.BackgroundColor3 = Color3.fromRGB(48, 26, 75)
-    AIToggleBtn.BackgroundTransparency = 0.3
+    AIToggleBtn.Position = UDim2.new(1, -84, 0.5, -13)
+    AIToggleBtn.Size = UDim2.new(0, 36, 0, 26)
+    AIToggleBtn.BackgroundColor3 = Color3.fromRGB(35, 20, 55)
+    AIToggleBtn.BackgroundTransparency = 0.2
     AIToggleBtn.Font = Enum.Font.GothamBold
-    AIToggleBtn.Text = "AI"
-    AIToggleBtn.TextColor3 = Color3.fromRGB(210, 185, 255)
+    AIToggleBtn.Text = "✨ AI"
+    AIToggleBtn.TextColor3 = Color3.fromRGB(225, 200, 255)
     AIToggleBtn.TextSize = 12
     AIToggleBtn.AutoButtonColor = false
 
     local AIBtnCorner = Instance.new("UICorner")
-    AIBtnCorner.CornerRadius = UDim.new(0, 6)
+    AIBtnCorner.CornerRadius = UDim.new(0, 8)
     AIBtnCorner.Parent = AIToggleBtn
 
     local AIBtnStroke = Instance.new("UIStroke")
     AIBtnStroke.Parent = AIToggleBtn
     AIBtnStroke.Color = Color3.fromRGB(160, 85, 235)
-    AIBtnStroke.Thickness = 1
-    AIBtnStroke.Transparency = 0.5
+    AIBtnStroke.Thickness = 1.2
+    AIBtnStroke.Transparency = 0.3
 
     AIToggleBtn.MouseEnter:Connect(function()
         TweenService:Create(AIToggleBtn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(160, 85, 235), TextColor3 = Color3.fromRGB(255, 255, 255)}):Play()
     end)
     AIToggleBtn.MouseLeave:Connect(function()
-        TweenService:Create(AIToggleBtn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(48, 26, 75), TextColor3 = Color3.fromRGB(210, 185, 255)}):Play()
+        TweenService:Create(AIToggleBtn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(35, 20, 55), TextColor3 = Color3.fromRGB(225, 200, 255)}):Play()
     end)
 
     -- Sürükleme Mantığı (Smooth Lerp + Modal)
@@ -244,33 +244,45 @@ function EliteHub:CreateWindow(Settings)
         Container.CanvasSize = UDim2.new(0, 0, 0, UIGrid.AbsoluteContentSize.Y + 10)
     end)
 
-    -- --- AYRI AI SOHBET MENÜSÜ (PENCERE İÇİNDE AÇILAN PANEL) ---
+    -- --- ANA MENÜNÜN SAĞ TARAFINDA AÇILAN YAN AI PANELİ ---
     local AIChatFrame = Instance.new("Frame")
-    AIChatFrame.Name = "AIChatFrame"
-    AIChatFrame.Parent = Content
-    AIChatFrame.Position = UDim2.new(0, 22, 0, 56)
-    AIChatFrame.Size = UDim2.new(1, -44, 0, 185)
-    AIChatFrame.BackgroundColor3 = Color3.fromRGB(18, 12, 28)
-    AIChatFrame.BackgroundTransparency = 0.1
+    AIChatFrame.Name = "AIChatSidePanel"
+    AIChatFrame.Parent = ScreenGui -- ScreenGui'ye bağlı ki ana pencerenin dışına, yanına taşabilsin
+    AIChatFrame.AnchorPoint = Vector2.new(0, 0.5)
+    AIChatFrame.Size = UDim2.new(0, 320, 0, 300)
+    AIChatFrame.BackgroundColor3 = Color3.fromRGB(12, 9, 18)
+    AIChatFrame.BackgroundTransparency = 0.25
     AIChatFrame.Visible = false
     AIChatFrame.ZIndex = 5
 
     local AIChatCorner = Instance.new("UICorner")
-    AIChatCorner.CornerRadius = UDim.new(0, 12)
+    AIChatCorner.CornerRadius = UDim.new(0, 20)
     AIChatCorner.Parent = AIChatFrame
 
     local AIChatStroke = Instance.new("UIStroke")
     AIChatStroke.Parent = AIChatFrame
     AIChatStroke.Color = Color3.fromRGB(160, 85, 235)
-    AIChatStroke.Thickness = 1.2
+    AIChatStroke.Thickness = 1.4
     AIChatStroke.Transparency = 0.3
 
-    -- Sohbet Geçmişi Kaydırma Alanı
+    -- Yan Panel Başlığı
+    local AIHeader = Instance.new("TextLabel")
+    AIHeader.Parent = AIChatFrame
+    AIHeader.Position = UDim2.new(0, 16, 0, 14)
+    AIHeader.Size = UDim2.new(1, -32, 0, 24)
+    AIHeader.BackgroundTransparency = 1
+    AIHeader.Font = Enum.Font.GothamBlack
+    AIHeader.Text = "ELITE AI ASSISTANT"
+    AIHeader.TextColor3 = Color3.fromRGB(245, 240, 255)
+    AIHeader.TextSize = 15
+    AIHeader.TextXAlignment = Enum.TextXAlignment.Left
+
+    -- Yan Panel Sohbet Geçmişi Alanı
     local ChatScroll = Instance.new("ScrollingFrame")
     ChatScroll.Name = "ChatScroll"
     ChatScroll.Parent = AIChatFrame
-    ChatScroll.Position = UDim2.new(0, 8, 0, 8)
-    ChatScroll.Size = UDim2.new(1, -16, 1, -52)
+    ChatScroll.Position = UDim2.new(0, 12, 0, 48)
+    ChatScroll.Size = UDim2.new(1, -24, 1, -100)
     ChatScroll.BackgroundTransparency = 1
     ChatScroll.ScrollBarThickness = 2
     ChatScroll.ScrollBarImageColor3 = Color3.fromRGB(160, 85, 235)
@@ -299,7 +311,7 @@ function EliteHub:CreateWindow(Settings)
         bubble.Size = UDim2.new(0.92, 0, 0, 0)
         bubble.AutomaticSize = Enum.AutomaticSize.Y
         bubble.Position = isUser and UDim2.new(0.08, 0, 0, 0) or UDim2.new(0, 0, 0, 0)
-        bubble.BackgroundColor3 = isUser and Color3.fromRGB(48, 26, 75) or Color3.fromRGB(12, 8, 18)
+        bubble.BackgroundColor3 = isUser and Color3.fromRGB(48, 26, 75) or Color3.fromRGB(18, 12, 28)
         bubble.BackgroundTransparency = 0.2
         bubble.Font = Enum.Font.Gotham
         bubble.Text = "<b>" .. sender .. ":</b>\n" .. text
@@ -321,14 +333,14 @@ function EliteHub:CreateWindow(Settings)
         padding.PaddingRight = UDim.new(0, 8)
     end
 
-    AddMessage("Elite AI", "Selam! Yapay zeka aktif. Kod yanıtları otomatik çalıştırılır.", false)
+    AddMessage("Elite AI", "Selam! Yan panel aktif. Kodlar otomatik çalıştırılır.", false)
 
-    -- Alt Mesaj Giriş Alanı
+    -- Yan Panel Alt Mesaj Giriş Alanı
     local AIInputBox = Instance.new("TextBox")
-AIInputBox.Name = "AIInputBox"
+    AIInputBox.Name = "AIInputBox"
     AIInputBox.Parent = AIChatFrame
-    AIInputBox.Position = UDim2.new(0, 8, 1, -38)
-    AIInputBox.Size = UDim2.new(0.74, -4, 0, 30)
+    AIInputBox.Position = UDim2.new(0, 12, 1, -44)
+    AIInputBox.Size = UDim2.new(0.72, 0, 0, 32)
     AIInputBox.BackgroundColor3 = Color3.fromRGB(12, 8, 18)
     AIInputBox.BackgroundTransparency = 0.5
     AIInputBox.Font = Enum.Font.GothamMedium
@@ -345,8 +357,8 @@ AIInputBox.Name = "AIInputBox"
     local AISendBtn = Instance.new("TextButton")
     AISendBtn.Name = "AISendBtn"
     AISendBtn.Parent = AIChatFrame
-    AISendBtn.Position = UDim2.new(0.76, 0, 1, -38)
-    AISendBtn.Size = UDim2.new(0.24, -4, 0, 30)
+    AISendBtn.Position = UDim2.new(0.74, 0, 1, -44)
+    AISendBtn.Size = UDim2.new(0.26, -12, 0, 32)
     AISendBtn.BackgroundColor3 = Color3.fromRGB(160, 85, 235)
     AISendBtn.BackgroundTransparency = 0.2
     AISendBtn.Font = Enum.Font.GothamBold
@@ -359,13 +371,19 @@ AIInputBox.Name = "AIInputBox"
     AISendCorner.CornerRadius = UDim.new(0, 6)
     AISendCorner.Parent = AISendBtn
 
-    -- AI Menüsünü Açıp Kapatma Mantığı
+    -- Yan Panelin Ana Menüyü Takip Etmesi ve Açılıp Kapanması
     local aiOpen = false
     AIToggleBtn.MouseButton1Click:Connect(function()
         aiOpen = not aiOpen
         AIChatFrame.Visible = aiOpen
-        Container.Visible = not aiOpen
-        AIToggleBtn.TextColor3 = aiOpen and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(210, 185, 255)
+        AIToggleBtn.TextColor3 = aiOpen and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(225, 200, 255)
+        AIToggleBtn.BackgroundColor3 = aiOpen and Color3.fromRGB(160, 85, 235) or Color3.fromRGB(35, 20, 55)
+    end)
+
+    -- Sürükleme esnasında yan panelin ana menüyü takip etmesi
+    RunService.RenderStepped:Connect(function()
+        -- Ana menünün sağ tarafına yapışık kalır (10 piksel boşlukla)
+        AIChatFrame.Position = UDim2.new(0, Main.AbsolutePosition.X + Main.AbsoluteSize.X + 10, 0, Main.AbsolutePosition.Y + (Main.AbsoluteSize.Y / 2))
     end)
 
     -- Mesaj Gönderme ve API İstek Mantığı
