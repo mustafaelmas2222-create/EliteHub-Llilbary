@@ -1,6 +1,6 @@
 -- ========================================================
--- ELITE HUB - Modern UI Library with Smart Side-by-Side AI Panel
--- Ekran Sınırı Korumalı ve Zarif Tasarımlı AI Entegrasyonu
+-- ELITE HUB - Modern UI Library with Polished AI & Boundaries
+-- Animasyonlu, Sohbet Hataları Düzeltilmiş ve Sınır Korumalı Sürüm
 -- ========================================================
 
 local EliteHub = {}
@@ -148,7 +148,7 @@ function EliteHub:CreateWindow(Settings)
         ScreenGui:Destroy()
     end)
 
-    -- Sağ Üst Uyumlu ve Zarif AI Tuşu
+    -- Sağ Üst Uyumlu AI Tuşu
     local AIToggleBtn = Instance.new("TextButton")
     AIToggleBtn.Name = "AIToggleBtn"
     AIToggleBtn.Parent = Header
@@ -195,7 +195,7 @@ function EliteHub:CreateWindow(Settings)
         }):Play()
     end)
 
-    -- Sürükleme Mantığı (Smooth Lerp + Modal)
+    -- Sürükleme ve Ekran Sınırı Koruması Mantığı
     local dragging = false
     local dragInput = nil
     local dragStart = nil
@@ -234,6 +234,18 @@ function EliteHub:CreateWindow(Settings)
     end)
 
     RunService.RenderStepped:Connect(function()
+        local viewportSize = workspace.CurrentCamera.ViewportSize
+        local currentPos = Main.Position
+        
+        -- Ana menünün ekran dışına çıkmasını engelle (Clamping)
+        local halfW = Main.AbsoluteSize.X / 2
+        local halfH = Main.AbsoluteSize.Y / 2
+        
+        local clampedX = math.clamp(currentPos.X.Offset, halfW, viewportSize.X - halfW)
+        local clampedY = math.clamp(currentPos.Y.Offset, halfH, viewportSize.Y - halfH)
+        
+        targetPos = UDim2.new(0, clampedX, 0, clampedY)
+
         if dragging or (Main.Position ~= targetPos) then
             Main.Position = Main.Position:Lerp(targetPos, 0.25)
         end
@@ -260,7 +272,7 @@ function EliteHub:CreateWindow(Settings)
         Container.CanvasSize = UDim2.new(0, 0, 0, UIGrid.AbsoluteContentSize.Y + 10)
     end)
 
-    -- --- AKILLI YAN AI PANELİ (Ekran Sınırı Korumalı) ---
+    -- --- AKILLI YAN AI PANELİ ---
     local AIChatFrame = Instance.new("Frame")
     AIChatFrame.Name = "AIChatSidePanel"
     AIChatFrame.Parent = ScreenGui
@@ -293,7 +305,7 @@ function EliteHub:CreateWindow(Settings)
     AIHeader.TextSize = 15
     AIHeader.TextXAlignment = Enum.TextXAlignment.Left
 
-    -- Yan Panel Sohbet Geçmişi Alanı
+    -- Yan Panel Sohbet Geçmişi Alanı (Hatalar Giderildi)
     local ChatScroll = Instance.new("ScrollingFrame")
     ChatScroll.Name = "ChatScroll"
     ChatScroll.Parent = AIChatFrame
@@ -324,9 +336,8 @@ function EliteHub:CreateWindow(Settings)
 
         local bubble = Instance.new("TextLabel")
         bubble.Parent = msgContainer
-        bubble.Size = UDim2.new(0.92, 0, 0, 0)
+        bubble.Size = UDim2.new(1, 0, 0, 0)
         bubble.AutomaticSize = Enum.AutomaticSize.Y
-        bubble.Position = isUser and UDim2.new(0.08, 0, 0, 0) or UDim2.new(0, 0, 0, 0)
         bubble.BackgroundColor3 = isUser and Color3.fromRGB(48, 26, 75) or Color3.fromRGB(18, 12, 28)
         bubble.BackgroundTransparency = 0.2
         bubble.Font = Enum.Font.Gotham
@@ -394,7 +405,7 @@ function EliteHub:CreateWindow(Settings)
         AIChatFrame.Visible = aiOpen
     end)
 
-    -- Akıllı Konumlandırma (Ekran dışına taşmayı önleyen sistem)
+    -- Yan Panelin Ekran Dışına Çıkmasını Önleyen Sınır Koruması
     RunService.RenderStepped:Connect(function()
         if not AIChatFrame.Visible then return end
 
@@ -404,15 +415,18 @@ function EliteHub:CreateWindow(Settings)
         local panelWidth = 300
         local spacing = 10
 
-        -- Varsayılan olarak ana menünün sağ tarafına yerleşmeyi dene
         local targetX = mainAbsPos.X + mainAbsSize.X + spacing
 
-        -- Eğer sağ taraf ekran dışına taşıyorsa, otomatik olarak sol tarafa kaydır
+        -- Eğer sağa sığmıyorsa sola al
         if (targetX + panelWidth) > viewportSize.X then
             targetX = mainAbsPos.X - panelWidth - spacing
         end
 
-        AIChatFrame.Position = UDim2.new(0, targetX, 0, mainAbsPos.Y + (mainAbsSize.Y / 2))
+        -- Yan panelin de ekran sınırları içinde kalmasını garantile
+        targetX = math.clamp(targetX, 10, viewportSize.X - panelWidth - 10)
+        local targetY = math.clamp(mainAbsPos.Y + (mainAbsSize.Y / 2), 150, viewportSize.Y - 150)
+
+        AIChatFrame.Position = UDim2.new(0, targetX, 0, targetY)
     end)
 
     -- Mesaj Gönderme ve API İstek Mantığı
@@ -426,10 +440,7 @@ function EliteHub:CreateWindow(Settings)
 
         task.spawn(function()
             local requestBody = {
-                language = "Luau",
-                task = "write",
-                prompt = "Eğer bir kod yazman gerekiyorsa, kesinlikle başı '[( ' ve sonu ' )]' olacak şekilde bu işaretlerin arasına koy. Normal metinlerde kullanma. İstek: " .. userMessage,
-                history = {}
+                message = "Eğer bir kod yazman gerekiyorsa, kesinlikle başı '[( ' ve sonu ' )]' olacak şekilde bu işaretlerin arasına koy. Normal metinlerde kullanma. İstek: " .. userMessage
             }
 
             local success, response = pcall(function()
@@ -446,8 +457,8 @@ function EliteHub:CreateWindow(Settings)
                     return HttpService:JSONDecode(response.Body)
                 end)
                 
-                if decodedSuccess and decodedBody and decodedBody.answer then
-                    local aiReply = tostring(decodedBody.answer)
+                if decodedSuccess and decodedBody and decodedBody.reply then
+                    local aiReply = tostring(decodedBody.reply)
                     AddMessage("Elite AI", aiReply, false)
 
                     -- [( ve )] arasındaki kodu otomatik çalıştır
@@ -466,7 +477,7 @@ function EliteHub:CreateWindow(Settings)
                         end
                     end
                 else
-                    AddMessage("Elite AI", "Hata: Yanıt şemasında 'answer' bulunamadı.", false)
+                    AddMessage("Elite AI", "Hata: Yanıt şemasında 'reply' bulunamadı.", false)
                 end
             else
                 AddMessage("Elite AI", "Bağlantı hatası oluştu!", false)
@@ -520,15 +531,15 @@ function EliteHub:CreateWindow(Settings)
     StatusText.TextSize = 11
     StatusText.TextXAlignment = Enum.TextXAlignment.Right
 
-    -- Açılış Animasyonu
+    -- Açılış Animasyonu (Smooth Tween)
     Main.Size = UDim2.new(0, 0, 0, 0)
     Shadow.ImageTransparency = 1
 
-    TweenService:Create(Main, TweenInfo.new(0.35, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
+    TweenService:Create(Main, TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
         Size = UDim2.new(0, 480, 0, 300)
     }):Play()
 
-    TweenService:Create(Shadow, TweenInfo.new(0.35), {
+    TweenService:Create(Shadow, TweenInfo.new(0.4), {
         ImageTransparency = 0.4
     }):Play()
 
