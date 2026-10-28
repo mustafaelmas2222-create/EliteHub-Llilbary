@@ -1,6 +1,5 @@
 -- ========================================================
--- ELITE HUB - Modern UI Library with Updated AI Endpoint
--- Güncellenmiş AI Endpoint ve Sınır Korumalı Sürüm
+-- ELITE HUB - Smart Script Analyzer & AI Assistant Edition
 -- ========================================================
 
 local EliteHub = {}
@@ -17,7 +16,7 @@ local LocalPlayer = Players.LocalPlayer
 
 function EliteHub:CreateWindow(Settings)
     Settings = Settings or {}
-    local WindowName = Settings.Name or "ELITE HUB"
+    WindowName = Settings.Name or "ELITE HUB"
     
     -- Eski GUI Temizliği
     if CoreGui:FindFirstChild("EliteHubLibrary") then
@@ -148,7 +147,7 @@ function EliteHub:CreateWindow(Settings)
         ScreenGui:Destroy()
     end)
 
-    -- Sağ Üst Uyumlu AI Tuşu
+    -- Sağ Üst AI Tuşu
     local AIToggleBtn = Instance.new("TextButton")
     AIToggleBtn.Name = "AIToggleBtn"
     AIToggleBtn.Parent = Header
@@ -195,7 +194,7 @@ function EliteHub:CreateWindow(Settings)
         }):Play()
     end)
 
-    -- Sürükleme ve Ekran Sınırı Koruması Mantığı
+    -- Sürükleme ve Ekran Sınırı Koruması
     local dragging = false
     local dragInput = nil
     local dragStart = nil
@@ -250,7 +249,7 @@ function EliteHub:CreateWindow(Settings)
         end
     end)
 
-    -- Normal İçerik Kapsayıcısı (ScrollingFrame)
+    -- Normal İçerik Kapsayıcısı
     local Container = Instance.new("ScrollingFrame")
     Container.Name = "Container"
     Container.Parent = Content
@@ -304,7 +303,7 @@ function EliteHub:CreateWindow(Settings)
     AIHeader.TextSize = 15
     AIHeader.TextXAlignment = Enum.TextXAlignment.Left
 
-    -- Yan Panel Sohbet Geçmişi Alanı
+    -- Sohbet Geçmişi Alanı
     local ChatScroll = Instance.new("ScrollingFrame")
     ChatScroll.Name = "ChatScroll"
     ChatScroll.Parent = AIChatFrame
@@ -359,7 +358,7 @@ function EliteHub:CreateWindow(Settings)
         padding.PaddingRight = UDim.new(0, 8)
     end
 
-    AddMessage("Elite AI", "Selam! Yan panel aktif. Kod yanıtları otomatik çalıştırılır.", false)
+    AddMessage("Elite AI", "Selam! Ben Elite AI. Script analizi yapabilir ve Synapse/Elite Hub hakkında sorularını yanıtlayabilirim.", false)
 
     -- Yan Panel Alt Mesaj Giriş Alanı
     local AIInputBox = Instance.new("TextBox")
@@ -370,7 +369,7 @@ function EliteHub:CreateWindow(Settings)
     AIInputBox.BackgroundColor3 = Color3.fromRGB(12, 8, 18)
     AIInputBox.BackgroundTransparency = 0.5
     AIInputBox.Font = Enum.Font.GothamMedium
-    AIInputBox.PlaceholderText = "Yapay zekaya sor..."
+    AIInputBox.PlaceholderText = "Script text veya soru yaz..."
     AIInputBox.Text = ""
     AIInputBox.TextColor3 = Color3.fromRGB(255, 255, 255)
     AIInputBox.TextSize = 11
@@ -404,7 +403,7 @@ function EliteHub:CreateWindow(Settings)
         AIChatFrame.Visible = aiOpen
     end)
 
-    -- Yan Panelin Ekran Dışına Çıkmasını Önleyen Sınır Koruması
+    -- Sınır Koruması
     RunService.RenderStepped:Connect(function()
         if not AIChatFrame.Visible then return end
 
@@ -426,7 +425,7 @@ function EliteHub:CreateWindow(Settings)
         AIChatFrame.Position = UDim2.new(0, targetX, 0, targetY)
     end)
 
-    -- Güncellenmiş Endpoint ve İstek Mantığı
+    -- Yapay Zekaya İstek Gönderme (Script Analiz Fonksiyonu)
     AISendBtn.MouseButton1Click:Connect(function()
         local userMessage = AIInputBox.Text
         if userMessage == "" then return end
@@ -438,9 +437,18 @@ function EliteHub:CreateWindow(Settings)
         task.spawn(function()
             local endpoint = "https://8328-ir9sdpad3s1gvk1yalxnx-2d7fefa8.us3.manus.computer/api/generate"
             
+            local smartPrompt = [[
+Sen Elite Hub ve Synapse Hub ekosisteminin resmi yapay zeka asistanısın. 
+Kuralların:
+1. Kullanıcı sana bir script, özellik açıklaması veya "script text" (örn: "fly noclip so good bypass") gönderdiğinde veya sorduğunda, ÖNCE bu scriptin ne işe yaradığını, nasıl çalıştığını, kullanıcısına ne sağladığını detaylı ve samimi bir dille açıkla.
+2. Synapse Hub veya Elite Hub hakkında sorular sorulduğunda detaylıca bilgi ver.
+3. Eğer kod üretmen gerekiyorsa, sözdizimi hatalarından arındırılmış kusursuz Luau kodu yaz ve bu kodu kesinlikle başı '[( ' ve sonu ' )]' olacak şekilde bu işaretlerin arasına koy. Açıklamalarda bu işaretleri asla kullanma.
+
+Kullanıcı Girdisi: ]] .. userMessage
+
             local requestBody = {
                 language = "luau",
-                prompt = "Eğer bir kod yazman gerekiyorsa, kesinlikle başı '[( ' ve sonu ' )]' olacak şekilde bu işaretlerin arasına koy. Normal metinlerde kullanma. İstek: " .. userMessage
+                prompt = smartPrompt
             }
 
             local success, response = pcall(function()
@@ -457,24 +465,22 @@ function EliteHub:CreateWindow(Settings)
                     return HttpService:JSONDecode(response.Body)
                 end)
                 
-                -- Yeni API yanıt şeması (result.output)
                 if decodedSuccess and decodedBody and decodedBody.output then
                     local aiReply = tostring(decodedBody.output)
                     AddMessage("Elite AI", aiReply, false)
 
-                    -- [( ve )] arasındaki kodu otomatik çalıştır
                     local extractedCode = aiReply:match("%[%((.-)%)]")
                     if extractedCode then
                         local func, err = loadstring(extractedCode)
                         if func then
                             local runSuccess, runErr = pcall(func)
                             if runSuccess then
-                                AddMessage("Sistem", "✔ Kod başarıyla çalıştırıldı!", false)
+                                AddMessage("Sistem", "✔ Script analiz edildi ve çalıştırıldı!", false)
                             else
                                 AddMessage("Sistem", "❌ Çalıştırma Hatası: " .. tostring(runErr), false)
                             end
                         else
-                            AddMessage("Sistem", "❌ Syntax Hatası: " .. tostring(err), false)
+                            AddMessage("Sistem", "❌ Sözdizimi Hatası: " .. tostring(err), false)
                         end
                     end
                 else
@@ -532,7 +538,7 @@ function EliteHub:CreateWindow(Settings)
     StatusText.TextSize = 11
     StatusText.TextXAlignment = Enum.TextXAlignment.Right
 
-    -- Açılış Animasyonu (Smooth Tween)
+    -- Açılış Animasyonu
     Main.Size = UDim2.new(0, 0, 0, 0)
     Shadow.ImageTransparency = 1
 
