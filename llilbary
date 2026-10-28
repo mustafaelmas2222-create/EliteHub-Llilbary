@@ -1,6 +1,6 @@
 -- ========================================================
--- ELITE HUB - MODERN UI + AI INTEGRATION
--- Rayfield Tarzı + Özel AI Penceresi
+-- ELITE HUB - Modern UI Library with Smart Side-by-Side AI Panel
+-- Ekran Sınırı Korumalı ve Zarif Tasarımlı AI Entegrasyonu
 -- ========================================================
 
 local EliteHub = {}
@@ -14,20 +14,6 @@ local CoreGui = game:GetService("CoreGui")
 local HttpService = game:GetService("HttpService")
 
 local LocalPlayer = Players.LocalPlayer
-
--- Renk Paleti (Zarif Mor/Mavi)
-local Colors = {
-    BG = Color3.fromRGB(12, 9, 18),
-    StrokeStart = Color3.fromRGB(160, 85, 235),
-    StrokeMid = Color3.fromRGB(35, 18, 55),
-    StrokeEnd = Color3.fromRGB(120, 50, 190),
-    TextMain = Color3.fromRGB(245, 240, 255),
-    TextSub = Color3.fromRGB(175, 130, 235),
-    BtnBg = Color3.fromRGB(22, 15, 32),
-    BtnHover = Color3.fromRGB(48, 26, 75),
-    AIBg = Color3.fromRGB(15, 12, 22), -- AI için biraz daha koyu
-    AIStroke = Color3.fromRGB(0, 200, 255), -- AI için özel mavi vurgu
-}
 
 function EliteHub:CreateWindow(Settings)
     Settings = Settings or {}
@@ -43,26 +29,32 @@ function EliteHub:CreateWindow(Settings)
     ScreenGui.Name = "EliteHubLibrary"
     ScreenGui.Parent = CoreGui
     ScreenGui.ResetOnSpawn = false
-    ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
-    -- ==========================================
-    -- ANA MENÜ (MAIN WINDOW)
-    -- ==========================================
+    -- Ana Gövde Panel (480x300)
     local Main = Instance.new("Frame")
     Main.Name = "Main"
     Main.Parent = ScreenGui
     Main.AnchorPoint = Vector2.new(0.5, 0.5)
     Main.Position = UDim2.new(0.5, 0, 0.5, 0)
     Main.Size = UDim2.new(0, 480, 0, 300)
-    Main.BackgroundColor3 = Colors.BG
+    Main.BackgroundColor3 = Color3.fromRGB(12, 9, 18)
     Main.BackgroundTransparency = 0.25
     Main.ClipsDescendants = false
-    Main.ZIndex = 10
 
     local MainCorner = Instance.new("UICorner")
     MainCorner.CornerRadius = UDim.new(0, 20)
     MainCorner.Parent = Main
 
+    -- Dokunmayı Arkaya Geçirmeyen Modal Siper
+    local ModalBlocker = Instance.new("TextButton")
+    ModalBlocker.Name = "ModalBlocker"
+    ModalBlocker.Parent = Main
+    ModalBlocker.Size = UDim2.new(1, 0, 1, 0)
+    ModalBlocker.BackgroundTransparency = 1
+    ModalBlocker.Text = ""
+    ModalBlocker.Modal = true
+
+    -- Arka Plan Gölgesi
     local Shadow = Instance.new("ImageLabel")
     Shadow.Name = "Shadow"
     Shadow.Parent = Main
@@ -75,6 +67,7 @@ function EliteHub:CreateWindow(Settings)
     Shadow.ImageTransparency = 0.4
     Shadow.ZIndex = 0
 
+    -- UI Stroke (Çerçeve Parlaması)
     local MainStroke = Instance.new("UIStroke")
     MainStroke.Parent = Main
     MainStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
@@ -82,26 +75,27 @@ function EliteHub:CreateWindow(Settings)
 
     local StrokeGradient = Instance.new("UIGradient")
     StrokeGradient.Color = ColorSequence.new({
-        ColorSequenceKeypoint.new(0, Colors.StrokeStart),
-        ColorSequenceKeypoint.new(0.5, Colors.StrokeMid),
-        ColorSequenceKeypoint.new(1, Colors.StrokeEnd)
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(160, 85, 235)),
+        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(35, 18, 55)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(120, 50, 190))
     })
     StrokeGradient.Rotation = 45
     StrokeGradient.Parent = MainStroke
 
+    -- İçerik Kapsayıcısı
     local Content = Instance.new("Frame")
     Content.Name = "Content"
     Content.Parent = Main
     Content.Size = UDim2.new(1, 0, 1, 0)
     Content.BackgroundTransparency = 1
-    Content.ClipsDescendants = true
+    Content.ClipsDescendants = false
     Content.ZIndex = 2
 
     local ContentCorner = Instance.new("UICorner")
     ContentCorner.CornerRadius = UDim.new(0, 20)
     ContentCorner.Parent = Content
 
-    -- Header
+    -- Header (Üst Alan)
     local Header = Instance.new("Frame")
     Header.Name = "Header"
     Header.Parent = Content
@@ -112,22 +106,22 @@ function EliteHub:CreateWindow(Settings)
     Title.Name = "Title"
     Title.Parent = Header
     Title.Position = UDim2.new(0, 22, 0.5, -13)
-    Title.Size = UDim2.new(0, 200, 0, 26)
+    Title.Size = UDim2.new(0, 180, 0, 26)
     Title.BackgroundTransparency = 1
     Title.Font = Enum.Font.GothamBlack
     Title.Text = string.upper(WindowName)
-    Title.TextColor3 = Colors.TextMain
+    Title.TextColor3 = Color3.fromRGB(245, 240, 255)
     Title.TextSize = 19
     Title.TextXAlignment = Enum.TextXAlignment.Left
 
     local TitleGradient = Instance.new("UIGradient")
     TitleGradient.Color = ColorSequence.new({
         ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
-        ColorSequenceKeypoint.new(1, Colors.TextSub)
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(175, 130, 235))
     })
     TitleGradient.Parent = Title
 
-    -- Kapatma Butonu (X)
+    -- Kapatma (X) Butonu
     local CloseBtn = Instance.new("TextButton")
     CloseBtn.Name = "CloseBtn"
     CloseBtn.Parent = Header
@@ -154,291 +148,54 @@ function EliteHub:CreateWindow(Settings)
         ScreenGui:Destroy()
     end)
 
-    -- ==========================================
-    -- AI BUTONU (SAĞ ÜST)
-    -- ==========================================
-    local AITriggerBtn = Instance.new("TextButton")
-    AITriggerBtn.Name = "AITrigger"
-    AITriggerBtn.Parent = Header
-    AITriggerBtn.Position = UDim2.new(1, -75, 0.5, -13) -- X butonunun solu
-    AITriggerBtn.Size = UDim2.new(0, 30, 0, 26)
-    AITriggerBtn.BackgroundTransparency = 1
-    AITriggerBtn.Font = Enum.Font.GothamBold
-    AITriggerBtn.Text = ""
-    AITriggerBtn.TextColor3 = Colors.AIStroke
-    AITriggerBtn.TextSize = 16
-    AITriggerBtn.AutoButtonColor = false
-    
-    -- Tooltip / Hover Efekti
-    AITriggerBtn.MouseEnter:Connect(function()
-        TweenService:Create(AITriggerBtn, TweenInfo.new(0.2), {TextColor3 = Color3.fromRGB(100, 255, 255), BackgroundTransparency = 0.8}):Play()
-    end)
-    AITriggerBtn.MouseLeave:Connect(function()
-        TweenService:Create(AITriggerBtn, TweenInfo.new(0.2), {TextColor3 = Colors.AIStroke, BackgroundTransparency = 1}):Play()
-    end)
+    -- Sağ Üst Uyumlu ve Zarif AI Tuşu
+    local AIToggleBtn = Instance.new("TextButton")
+    AIToggleBtn.Name = "AIToggleBtn"
+    AIToggleBtn.Parent = Header
+    AIToggleBtn.Position = UDim2.new(1, -78, 0.5, -13)
+    AIToggleBtn.Size = UDim2.new(0, 30, 0, 26)
+    AIToggleBtn.BackgroundColor3 = Color3.fromRGB(22, 15, 32)
+    AIToggleBtn.BackgroundTransparency = 0.3
+    AIToggleBtn.Font = Enum.Font.GothamBold
+    AIToggleBtn.Text = "✨"
+    AIToggleBtn.TextColor3 = Color3.fromRGB(210, 185, 255)
+    AIToggleBtn.TextSize = 13
+    AIToggleBtn.AutoButtonColor = false
 
-    -- ==========================================
-    -- AI PENCERESİ (Oluşturma Fonksiyonu)
-    -- ==========================================
-    local AIWindow = nil
-    local IsAIOpen = false
-    
-    local function CreateAIWindow()
-        if AIWindow then return end -- Zaten varsa açma
-        
-        AIWindow = Instance.new("Frame")
-        AIWindow.Name = "AIWindow"
-        AIWindow.Parent = ScreenGui
-        AIWindow.Size = UDim2.new(0, 320, 0, 400)
-        AIWindow.BackgroundColor3 = Colors.AIBg
-        AIWindow.BackgroundTransparency = 0.2
-        AIWindow.BorderSizePixel = 0
-        AIWindow.ZIndex = 20 -- Ana menünün üstünde
-        
-        local AICorner = Instance.new("UICorner")
-        AICorner.CornerRadius = UDim.new(0, 16)
-        AICorner.Parent = AIWindow
-        
-        local AIStroke = Instance.new("UIStroke")
-        AIStroke.Parent = AIWindow
-        AIStroke.Color = Colors.AIStroke
-        AIStroke.Thickness = 1.5
-        AIStroke.Transparency = 0.3
-        
-        -- AI Header
-        local AIHeader = Instance.new("Frame")
-        AIHeader.Name = "Header"
-        AIHeader.Parent = AIWindow
-        AIHeader.Size = UDim2.new(1, 0, 0, 40)
-        AIHeader.BackgroundTransparency = 1
-        
-        local AITitle = Instance.new("TextLabel")
-        AITitle.Name = "Title"
-        AITitle.Parent = AIHeader
-        AITitle.Position = UDim2.new(0, 15, 0.5, 0)
-        AITitle.Size = UDim2.new(0, 200, 0, 20)
-        AITitle.BackgroundTransparency = 1
-        AITitle.Font = Enum.Font.GothamBold
-        AITitle.Text = "ELITE AI ASSISTANT"
-        AITitle.TextColor3 = Colors.AIStroke
-        AITitle.TextSize = 14
-        AITitle.TextXAlignment = Enum.TextXAlignment.Left
-        
-        local AIClose = Instance.new("TextButton")
-        AIClose.Name = "Close"
-        AIClose.Parent = AIHeader
-        AIClose.Position = UDim2.new(1, -25, 0.5, 0)
-        AIClose.Size = UDim2.new(0, 20, 0, 20)
-        AIClose.BackgroundTransparency = 1
-        AIClose.Font = Enum.Font.ArialBold
-        AIClose.Text = "X"
-        AIClose.TextColor3 = Color3.fromRGB(200, 200, 200)
-        AIClose.TextSize = 14
-        AIClose.MouseButton1Click:Connect(function()
-            ToggleAI(false)
-        end)
-        
-        -- Chat Area (Scrolling)
-        local ChatFrame = Instance.new("ScrollingFrame")
-        ChatFrame.Name = "Chat"
-        ChatFrame.Parent = AIWindow
-        ChatFrame.Position = UDim2.new(0, 10, 0, 50)
-        ChatFrame.Size = UDim2.new(1, -20, 1, -110)
-        ChatFrame.BackgroundTransparency = 1
-        ChatFrame.ScrollBarThickness = 4
-        ChatFrame.ScrollBarImageColor3 = Colors.AIStroke
-        ChatFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
-        
-        local ChatLayout = Instance.new("UIListLayout")
-        ChatLayout.Parent = ChatFrame
-        ChatLayout.Padding = UDim.new(0, 8)
-        ChatLayout.SortOrder = Enum.SortOrder.LayoutOrder
-        ChatLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-        
-        ChatFrame:GetPropertyChangedSignal("AbsoluteCanvasSize"):Connect(function()
-            ChatFrame.CanvasSize = UDim2.new(0, 0, 0, ChatLayout.AbsoluteContentSize.Y + 16)
-            ChatFrame.CanvasPosition = Vector2.new(0, ChatLayout.AbsoluteContentSize.Y)
-        end)
-        
-        -- Input Area
-        local InputFrame = Instance.new("Frame")
-        InputFrame.Name = "Input"
-        InputFrame.Parent = AIWindow
-        InputFrame.Position = UDim2.new(0, 10, 1, -50)
-        InputFrame.Size = UDim2.new(1, -20, 0, 40)
-        InputFrame.BackgroundColor3 = Color3.fromRGB(30, 25, 45)
-        InputFrame.BackgroundTransparency = 0.3
-        
-        local InputCorner = Instance.new("UICorner")
-        InputCorner.CornerRadius = UDim.new(0, 10)
-        InputCorner.Parent = InputFrame
-        
-        local TextBox = Instance.new("TextBox")
-        TextBox.Parent = InputFrame
-        TextBox.Size = UDim2.new(1, -50, 1, 0)
-        TextBox.Position = UDim2.new(0, 10, 0, 0)
-        TextBox.BackgroundTransparency = 1
-        TextBox.Font = Enum.Font.Gotham
-        TextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
-        TextBox.TextSize = 13
-        TextBox.PlaceholderText = "Sorunuzu yazın..."
-        TextBox.PlaceholderColor3 = Color3.fromRGB(150, 150, 150)
-        TextBox.TextXAlignment = Enum.TextXAlignment.Left
-        
-        local SendBtn = Instance.new("TextButton")
-        SendBtn.Parent = InputFrame
-        SendBtn.Position = UDim2.new(1, -35, 0, 5)
-        SendBtn.Size = UDim2.new(0, 30, 0, 30)
-        SendBtn.BackgroundTransparency = 1
-        SendBtn.Font = Enum.Font.ArialBold
-        SendBtn.Text = "➤"
-        SendBtn.TextColor3 = Colors.AIStroke
-        SendBtn.TextSize = 16
-        
-        -- Gönderme Mantığı
-        local function AddMessage(text, isUser)
-            local MsgFrame = Instance.new("Frame")
-            MsgFrame.Size = UDim2.new(1, -10, 0, 0) -- Yükseklik metne göre ayarlanacak
-            MsgFrame.BackgroundTransparency = 1
-            MsgFrame.Parent = ChatFrame
-            
-            local MsgText = Instance.new("TextLabel")
-            MsgText.Parent = MsgFrame
-            MsgText.Size = UDim2.new(1, 0, 0, 0)
-            MsgText.BackgroundTransparency = 1
-            MsgText.Font = Enum.Font.Gotham
-            MsgText.TextSize = 13
-            MsgText.TextColor3 = isUser and Color3.fromRGB(200, 200, 255) or Color3.fromRGB(100, 255, 200)
-            MsgText.Text = text
-            MsgText.TextWrapped = true
-            MsgText.TextXAlignment = isUser and Enum.TextXAlignment.Right or Enum.TextXAlignment.Left
-            MsgText.Position = UDim2.new(isUser and 0.2 or 0, 0, 0, 0)
-            MsgText.Size = UDim2.new(isUser and 0.8 or 0.8, 0, 0, 0)
-            
-            -- Otomatik yükseklik ayarı (basitçe)
-            MsgText:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
-                MsgFrame.Size = UDim2.new(1, -10, 0, MsgText.AbsoluteSize.Y + 10)
-            end)
-            
-            -- İlk yükleme için tetikle
-            task.wait()
-            MsgFrame.Size = UDim2.new(1, -10, 0, MsgText.AbsoluteSize.Y + 10)
-        end
-        
-        local function SendRequest()
-            local msg = TextBox.Text
-            if msg == "" then return end
-            
-            AddMessage(msg, true)
-            TextBox.Text = ""
-            
-            -- Yükleniyor mesajı
-            local loadingMsg = Instance.new("TextLabel")
-            loadingMsg.Name = "Loading"
-            loadingMsg.Parent = ChatFrame
-            loadingMsg.Size = UDim2.new(1, -10, 0, 20)
-            loadingMsg.BackgroundTransparency = 1
-            loadingMsg.Font = Enum.Font.GothamItalic
-            loadingMsg.TextSize = 12
-            loadingMsg.TextColor3 = Color3.fromRGB(150, 150, 150)
-            loadingMsg.Text = "Düşünülüyor..."
-            loadingMsg.TextXAlignment = Enum.TextXAlignment.Left
-            
-            -- API İsteği
-            local success, result = pcall(function()
-                local response = HttpService:RequestAsync({
-                    Url = "https://8328-iaegwjno6hih212t36m6p-3442aba1.us3.manus.computer/api/chat",
-                    Method = "POST",
-                    Headers = { ["Content-Type"] = "application/json" },
-                    Body = HttpService:JSONEncode({ message = msg }),
-                })
-                if response.StatusCode == 200 then
-                    local data = HttpService:JSONDecode(response.Body)
-                    return data.reply or "Cevap alınamadı."
-                else
-                    return "Hata: " .. tostring(response.StatusCode)
-                end
-            end)
-            
-            loadingMsg:Destroy()
-            
-            if success then
-                AddMessage(result, false)
-            else
-                AddMessage("Bağlantı hatası: " .. tostring(result), false)
-            end
-        end
-        
-        SendBtn.MouseButton1Click:Connect(SendRequest)
-        TextBox.FocusLost:Connect(function(enterPressed)
-            if enterPressed then SendRequest() end
-        end)
-        
-        -- Animasyonla Aç
-        AIWindow.Size = UDim2.new(0, 0, 0, 0)
-        AIWindow.Position = UDim2.new(0, Main.Position.X.Offset + 250, 0, Main.Position.Y.Offset) -- Başlangıç pozisyonu (geçici)
-        AIWindow.Visible = true
-        
-        TweenService:Create(AIWindow, TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
-            Size = UDim2.new(0, 320, 0, 400)
+    local AIBtnCorner = Instance.new("UICorner")
+    AIBtnCorner.CornerRadius = UDim.new(0, 8)
+    AIBtnCorner.Parent = AIToggleBtn
+
+    local AIBtnStroke = Instance.new("UIStroke")
+    AIBtnStroke.Parent = AIToggleBtn
+    AIBtnStroke.Color = Color3.fromRGB(65, 38, 98)
+    AIBtnStroke.Thickness = 1.2
+    AIBtnStroke.Transparency = 0.5
+
+    AIToggleBtn.MouseEnter:Connect(function()
+        TweenService:Create(AIToggleBtn, TweenInfo.new(0.15), {
+            BackgroundColor3 = Color3.fromRGB(48, 26, 75),
+            BackgroundTransparency = 0.1,
+            TextColor3 = Color3.fromRGB(255, 255, 255)
         }):Play()
-        
-        IsAIOpen = true
-    end
-    
-    local function ToggleAI(state)
-        if state == nil then state = not IsAIOpen end
-        
-        if state and not IsAIOpen then
-            CreateAIWindow()
-            -- Pozisyon güncelleme döngüsü başlat (Ana menü hareket ederse AI da gelsin)
-            task.spawn(function()
-                while IsAIOpen and AIWindow and Main do
-                    local mainPos = Main.Position
-                    local viewport = workspace.CurrentCamera.ViewportSize
-                    
-                    -- Hedef X: Ana menünün sağı
-                    local targetX = mainPos.X.Offset + 250 -- 480/2 + boşluk
-                    
-                    -- Ekran Sınırı Kontrolü
-                    if targetX + 320 > viewport.X then
-                        -- Sağa taşıyorsa ekran dışına çıkıyor, o zaman sola al
-                        targetX = mainPos.X.Offset - 330
-                    end
-                    
-                    -- Y pozisyonu aynı kalsın
-                    local targetY = mainPos.Y.Offset
-                    
-                    -- Yumuşak geçiş (Lerp)
-                    local currentPos = AIWindow.Position
-                    local newPos = UDim2.new(0, currentPos.X.Offset + (targetX - currentPos.X.Offset) * 0.1, 0, currentPos.Y.Offset + (targetY - currentPos.Y.Offset) * 0.1)
-                    AIWindow.Position = newPos
-                    
-                    task.wait(0.03)
-                end
-            end)
-        elseif not state and IsAIOpen then
-            if AIWindow then
-                TweenService:Create(AIWindow, TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.In), {
-                    Size = UDim2.new(0, 0, 0, 0)
-                }):Play()
-                task.wait(0.25)
-                AIWindow:Destroy()
-                AIWindow = nil
-            end
-            IsAIOpen = false
-        end
-    end
-    
-    -- AI Butonuna Tıklama
-    AITriggerBtn.MouseButton1Click:Connect(function()
-        ToggleAI()
+        TweenService:Create(AIBtnStroke, TweenInfo.new(0.15), {
+            Color = Color3.fromRGB(160, 85, 235),
+            Transparency = 0
+        }):Play()
+    end)
+    AIToggleBtn.MouseLeave:Connect(function()
+        TweenService:Create(AIToggleBtn, TweenInfo.new(0.15), {
+            BackgroundColor3 = Color3.fromRGB(22, 15, 32),
+            BackgroundTransparency = 0.3,
+            TextColor3 = Color3.fromRGB(210, 185, 255)
+        }):Play()
+        TweenService:Create(AIBtnStroke, TweenInfo.new(0.15), {
+            Color = Color3.fromRGB(65, 38, 98),
+            Transparency = 0.5
+        }):Play()
     end)
 
-    -- ==========================================
-    -- SÜRÜKLEME & İÇERİK (ANA MENÜ)
-    -- ==========================================
-    
+    -- Sürükleme Mantığı (Smooth Lerp + Modal)
     local dragging = false
     local dragInput = nil
     local dragStart = nil
@@ -452,7 +209,15 @@ function EliteHub:CreateWindow(Settings)
             dragStart = input.Position
             startPos = Main.Position
             targetPos = Main.Position
-            -- AI penceresi açıksa onu da takip ettirmek için döngü zaten var
+
+            local conn
+            conn = input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
+                    dragInput = nil
+                    conn:Disconnect()
+                end
+            end)
         end
     end)
 
@@ -474,7 +239,7 @@ function EliteHub:CreateWindow(Settings)
         end
     end)
 
-    -- Container (Butonlar buraya gelecek)
+    -- Normal İçerik Kapsayıcısı (ScrollingFrame)
     local Container = Instance.new("ScrollingFrame")
     Container.Name = "Container"
     Container.Parent = Content
@@ -482,7 +247,7 @@ function EliteHub:CreateWindow(Settings)
     Container.Position = UDim2.new(0, 22, 0, 56)
     Container.Size = UDim2.new(1, -44, 0, 185)
     Container.ScrollBarThickness = 2
-    Container.ScrollBarImageColor3 = Colors.StrokeEnd
+    Container.ScrollBarImageColor3 = Color3.fromRGB(150, 90, 220)
     Container.BorderSizePixel = 0
 
     local UIGrid = Instance.new("UIGridLayout")
@@ -495,7 +260,223 @@ function EliteHub:CreateWindow(Settings)
         Container.CanvasSize = UDim2.new(0, 0, 0, UIGrid.AbsoluteContentSize.Y + 10)
     end)
 
-    -- Footer
+    -- --- AKILLI YAN AI PANELİ (Ekran Sınırı Korumalı) ---
+    local AIChatFrame = Instance.new("Frame")
+    AIChatFrame.Name = "AIChatSidePanel"
+    AIChatFrame.Parent = ScreenGui
+    AIChatFrame.AnchorPoint = Vector2.new(0, 0.5)
+    AIChatFrame.Size = UDim2.new(0, 300, 0, 300)
+    AIChatFrame.BackgroundColor3 = Color3.fromRGB(12, 9, 18)
+    AIChatFrame.BackgroundTransparency = 0.25
+    AIChatFrame.Visible = false
+    AIChatFrame.ZIndex = 5
+
+    local AIChatCorner = Instance.new("UICorner")
+    AIChatCorner.CornerRadius = UDim.new(0, 20)
+    AIChatCorner.Parent = AIChatFrame
+
+    local AIChatStroke = Instance.new("UIStroke")
+    AIChatStroke.Parent = AIChatFrame
+    AIChatStroke.Color = Color3.fromRGB(160, 85, 235)
+    AIChatStroke.Thickness = 1.4
+    AIChatStroke.Transparency = 0.3
+
+    -- Yan Panel Başlığı
+    local AIHeader = Instance.new("TextLabel")
+    AIHeader.Parent = AIChatFrame
+    AIHeader.Position = UDim2.new(0, 16, 0, 14)
+    AIHeader.Size = UDim2.new(1, -32, 0, 24)
+    AIHeader.BackgroundTransparency = 1
+    AIHeader.Font = Enum.Font.GothamBlack
+    AIHeader.Text = "ELITE AI ASSISTANT"
+    AIHeader.TextColor3 = Color3.fromRGB(245, 240, 255)
+    AIHeader.TextSize = 15
+    AIHeader.TextXAlignment = Enum.TextXAlignment.Left
+
+    -- Yan Panel Sohbet Geçmişi Alanı
+    local ChatScroll = Instance.new("ScrollingFrame")
+    ChatScroll.Name = "ChatScroll"
+    ChatScroll.Parent = AIChatFrame
+    ChatScroll.Position = UDim2.new(0, 12, 0, 48)
+    ChatScroll.Size = UDim2.new(1, -24, 1, -100)
+    ChatScroll.BackgroundTransparency = 1
+    ChatScroll.ScrollBarThickness = 2
+    ChatScroll.ScrollBarImageColor3 = Color3.fromRGB(160, 85, 235)
+    ChatScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
+    ChatScroll.BorderSizePixel = 0
+
+    local ChatList = Instance.new("UIListLayout")
+    ChatList.Parent = ChatScroll
+    ChatList.SortOrder = Enum.SortOrder.LayoutOrder
+    ChatList.Padding = UDim.new(0, 6)
+
+    ChatList:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+        ChatScroll.CanvasSize = UDim2.new(0, 0, 0, ChatList.AbsoluteContentSize.Y + 10)
+        ChatScroll.CanvasPosition = Vector2.new(0, ChatList.AbsoluteContentSize.Y)
+    end)
+
+    local function AddMessage(sender, text, isUser)
+        local msgContainer = Instance.new("Frame")
+        msgContainer.Parent = ChatScroll
+        msgContainer.Size = UDim2.new(1, 0, 0, 0)
+        msgContainer.AutomaticSize = Enum.AutomaticSize.Y
+        msgContainer.BackgroundTransparency = 1
+
+        local bubble = Instance.new("TextLabel")
+        bubble.Parent = msgContainer
+        bubble.Size = UDim2.new(0.92, 0, 0, 0)
+        bubble.AutomaticSize = Enum.AutomaticSize.Y
+        bubble.Position = isUser and UDim2.new(0.08, 0, 0, 0) or UDim2.new(0, 0, 0, 0)
+        bubble.BackgroundColor3 = isUser and Color3.fromRGB(48, 26, 75) or Color3.fromRGB(18, 12, 28)
+        bubble.BackgroundTransparency = 0.2
+        bubble.Font = Enum.Font.Gotham
+        bubble.Text = "<b>" .. sender .. ":</b>\n" .. text
+        bubble.TextColor3 = Color3.fromRGB(235, 225, 255)
+        bubble.TextSize = 11
+        bubble.TextWrapped = true
+        bubble.RichText = true
+        bubble.TextXAlignment = Enum.TextXAlignment.Left
+
+        local bubbleCorner = Instance.new("UICorner")
+        bubbleCorner.CornerRadius = UDim.new(0, 6)
+        bubbleCorner.Parent = bubble
+
+        local padding = Instance.new("UIPadding")
+        padding.Parent = bubble
+        padding.PaddingTop = UDim.new(0, 6)
+        padding.PaddingBottom = UDim.new(0, 6)
+        padding.PaddingLeft = UDim.new(0, 8)
+        padding.PaddingRight = UDim.new(0, 8)
+    end
+
+    AddMessage("Elite AI", "Selam! Yan panel aktif. Kod yanıtları otomatik çalıştırılır.", false)
+
+    -- Yan Panel Alt Mesaj Giriş Alanı
+    local AIInputBox = Instance.new("TextBox")
+    AIInputBox.Name = "AIInputBox"
+    AIInputBox.Parent = AIChatFrame
+    AIInputBox.Position = UDim2.new(0, 12, 1, -44)
+    AIInputBox.Size = UDim2.new(0.72, 0, 0, 32)
+    AIInputBox.BackgroundColor3 = Color3.fromRGB(12, 8, 18)
+    AIInputBox.BackgroundTransparency = 0.5
+    AIInputBox.Font = Enum.Font.GothamMedium
+    AIInputBox.PlaceholderText = "Yapay zekaya sor..."
+    AIInputBox.Text = ""
+    AIInputBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+    AIInputBox.TextSize = 11
+    AIInputBox.ClearTextOnFocus = false
+
+    local AIInputCorner = Instance.new("UICorner")
+    AIInputCorner.CornerRadius = UDim.new(0, 6)
+    AIInputCorner.Parent = AIInputBox
+
+    local AISendBtn = Instance.new("TextButton")
+    AISendBtn.Name = "AISendBtn"
+    AISendBtn.Parent = AIChatFrame
+    AISendBtn.Position = UDim2.new(0.74, 0, 1, -44)
+    AISendBtn.Size = UDim2.new(0.26, -12, 0, 32)
+    AISendBtn.BackgroundColor3 = Color3.fromRGB(160, 85, 235)
+    AISendBtn.BackgroundTransparency = 0.2
+    AISendBtn.Font = Enum.Font.GothamBold
+    AISendBtn.Text = "Gönder"
+    AISendBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    AISendBtn.TextSize = 11
+    AISendBtn.AutoButtonColor = false
+
+    local AISendCorner = Instance.new("UICorner")
+    AISendCorner.CornerRadius = UDim.new(0, 6)
+    AISendCorner.Parent = AISendBtn
+
+    -- Yan Paneli Açıp Kapatma Mantığı
+    local aiOpen = false
+    AIToggleBtn.MouseButton1Click:Connect(function()
+        aiOpen = not aiOpen
+        AIChatFrame.Visible = aiOpen
+    end)
+
+    -- Akıllı Konumlandırma (Ekran dışına taşmayı önleyen sistem)
+    RunService.RenderStepped:Connect(function()
+        if not AIChatFrame.Visible then return end
+
+        local viewportSize = workspace.CurrentCamera.ViewportSize
+        local mainAbsPos = Main.AbsolutePosition
+        local mainAbsSize = Main.AbsoluteSize
+        local panelWidth = 300
+        local spacing = 10
+
+        -- Varsayılan olarak ana menünün sağ tarafına yerleşmeyi dene
+        local targetX = mainAbsPos.X + mainAbsSize.X + spacing
+
+        -- Eğer sağ taraf ekran dışına taşıyorsa, otomatik olarak sol tarafa kaydır
+        if (targetX + panelWidth) > viewportSize.X then
+            targetX = mainAbsPos.X - panelWidth - spacing
+        end
+
+        AIChatFrame.Position = UDim2.new(0, targetX, 0, mainAbsPos.Y + (mainAbsSize.Y / 2))
+    end)
+
+    -- Mesaj Gönderme ve API İstek Mantığı
+    AISendBtn.MouseButton1Click:Connect(function()
+        local userMessage = AIInputBox.Text
+        if userMessage == "" then return end
+
+        AddMessage("Sen", userMessage, true)
+        AIInputBox.Text = ""
+        AISendBtn.Active = false
+
+        task.spawn(function()
+            local requestBody = {
+                language = "Luau",
+                task = "write",
+                prompt = "Eğer bir kod yazman gerekiyorsa, kesinlikle başı '[( ' ve sonu ' )]' olacak şekilde bu işaretlerin arasına koy. Normal metinlerde kullanma. İstek: " .. userMessage,
+                history = {}
+            }
+
+            local success, response = pcall(function()
+                return HttpService:RequestAsync({
+                    Url = "https://8328-iaegwjno6hih212t36m6p-3442aba1.us3.manus.computer/api/chat",
+                    Method = "POST",
+                    Headers = { ["Content-Type"] = "application/json" },
+                    Body = HttpService:JSONEncode(requestBody),
+                })
+            end)
+
+            if success and response and response.Success then
+                local decodedSuccess, decodedBody = pcall(function()
+                    return HttpService:JSONDecode(response.Body)
+                end)
+                
+                if decodedSuccess and decodedBody and decodedBody.answer then
+                    local aiReply = tostring(decodedBody.answer)
+                    AddMessage("Elite AI", aiReply, false)
+
+                    -- [( ve )] arasındaki kodu otomatik çalıştır
+                    local extractedCode = aiReply:match("%[%((.-)%)]")
+                    if extractedCode then
+                        local func, err = loadstring(extractedCode)
+                        if func then
+                            local runSuccess, runErr = pcall(func)
+                            if runSuccess then
+                                AddMessage("Sistem", "✔ Kod başarıyla çalıştırıldı!", false)
+                            else
+                                AddMessage("Sistem", "❌ Çalıştırma Hatası: " .. tostring(runErr), false)
+                            end
+                        else
+                            AddMessage("Sistem", "❌ Syntax Hatası: " .. tostring(err), false)
+                        end
+                    end
+                else
+                    AddMessage("Elite AI", "Hata: Yanıt şemasında 'answer' bulunamadı.", false)
+                end
+            else
+                AddMessage("Elite AI", "Bağlantı hatası oluştu!", false)
+            end
+            AISendBtn.Active = true
+        end)
+    end)
+    --------------------------------------------------------
+
+    -- Profil Alt Şeridi
     local UserFooter = Instance.new("Frame")
     UserFooter.Name = "UserFooter"
     UserFooter.Parent = Content
@@ -510,6 +491,7 @@ function EliteHub:CreateWindow(Settings)
     UserAvatar.Size = UDim2.new(0, 26, 0, 26)
     UserAvatar.BackgroundTransparency = 1
     UserAvatar.Image = "rbxthumb://type=AvatarHeadShot&id=" .. LocalPlayer.UserId .. "&w=150&h=150"
+
     local AvatarCorner = Instance.new("UICorner")
     AvatarCorner.CornerRadius = UDim.new(1, 0)
     AvatarCorner.Parent = UserAvatar
@@ -541,11 +523,18 @@ function EliteHub:CreateWindow(Settings)
     -- Açılış Animasyonu
     Main.Size = UDim2.new(0, 0, 0, 0)
     Shadow.ImageTransparency = 1
-    TweenService:Create(Main, TweenInfo.new(0.35, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), { Size = UDim2.new(0, 480, 0, 300) }):Play()
-    TweenService:Create(Shadow, TweenInfo.new(0.35), { ImageTransparency = 0.4 }):Play()
 
-    -- Return Elements
+    TweenService:Create(Main, TweenInfo.new(0.35, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
+        Size = UDim2.new(0, 480, 0, 300)
+    }):Play()
+
+    TweenService:Create(Shadow, TweenInfo.new(0.35), {
+        ImageTransparency = 0.4
+    }):Play()
+
+    -- Tab Yapısı Nesnesi
     local WindowElements = {}
+
     function WindowElements:CreateButton(ButtonSettings)
         ButtonSettings = ButtonSettings or {}
         local BtnName = ButtonSettings.Name or "Button"
@@ -554,7 +543,7 @@ function EliteHub:CreateWindow(Settings)
         local btn = Instance.new("TextButton")
         btn.Name = BtnName
         btn.Parent = Container
-        btn.BackgroundColor3 = Colors.BtnBg
+        btn.BackgroundColor3 = Color3.fromRGB(22, 15, 32)
         btn.BackgroundTransparency = 0.3
         btn.AutoButtonColor = false
         btn.Font = Enum.Font.GothamMedium
@@ -572,21 +561,40 @@ function EliteHub:CreateWindow(Settings)
         btnStroke.Thickness = 1.2
         btnStroke.Transparency = 0.5
 
+        -- Hover & Click Animasyonu
         btn.MouseEnter:Connect(function()
-            TweenService:Create(btn, TweenInfo.new(0.15), { BackgroundColor3 = Colors.BtnHover, BackgroundTransparency = 0.1, TextColor3 = Color3.fromRGB(255, 255, 255) }):Play()
-            TweenService:Create(btnStroke, TweenInfo.new(0.15), { Color = Colors.StrokeStart, Transparency = 0 }):Play()
+            TweenService:Create(btn, TweenInfo.new(0.15), {
+                BackgroundColor3 = Color3.fromRGB(48, 26, 75),
+                BackgroundTransparency = 0.1,
+                TextColor3 = Color3.fromRGB(255, 255, 255)
+            }):Play()
+            TweenService:Create(btnStroke, TweenInfo.new(0.15), {
+                Color = Color3.fromRGB(160, 85, 235),
+                Transparency = 0
+            }):Play()
         end)
+
         btn.MouseLeave:Connect(function()
-            TweenService:Create(btn, TweenInfo.new(0.15), { BackgroundColor3 = Colors.BtnBg, BackgroundTransparency = 0.3, TextColor3 = Color3.fromRGB(220, 210, 235) }):Play()
-            TweenService:Create(btnStroke, TweenInfo.new(0.15), { Color = Color3.fromRGB(65, 38, 98), Transparency = 0.5 }):Play()
+            TweenService:Create(btn, TweenInfo.new(0.15), {
+                BackgroundColor3 = Color3.fromRGB(22, 15, 32),
+                BackgroundTransparency = 0.3,
+                TextColor3 = Color3.fromRGB(220, 210, 235)
+            }):Play()
+            TweenService:Create(btnStroke, TweenInfo.new(0.15), {
+                Color = Color3.fromRGB(65, 38, 98),
+                Transparency = 0.5
+            }):Play()
         end)
+
         btn.MouseButton1Down:Connect(function()
             TweenService:Create(btn, TweenInfo.new(0.06), {Size = UDim2.new(0.45, 0, 0, 63)}):Play()
         end)
+
         btn.MouseButton1Up:Connect(function()
             TweenService:Create(btn, TweenInfo.new(0.1), {Size = UDim2.new(0.48, 0, 0, 68)}):Play()
             pcall(Callback)
         end)
+
         return btn
     end
 
