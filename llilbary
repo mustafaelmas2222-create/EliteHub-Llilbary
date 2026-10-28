@@ -1,6 +1,6 @@
 -- ========================================================
--- ELITE HUB - Modern UI Library with Polished AI & Boundaries
--- Animasyonlu, Sohbet Hataları Düzeltilmiş ve Sınır Korumalı Sürüm
+-- ELITE HUB - Modern UI Library with Updated AI Endpoint
+-- Güncellenmiş AI Endpoint ve Sınır Korumalı Sürüm
 -- ========================================================
 
 local EliteHub = {}
@@ -237,7 +237,6 @@ function EliteHub:CreateWindow(Settings)
         local viewportSize = workspace.CurrentCamera.ViewportSize
         local currentPos = Main.Position
         
-        -- Ana menünün ekran dışına çıkmasını engelle (Clamping)
         local halfW = Main.AbsoluteSize.X / 2
         local halfH = Main.AbsoluteSize.Y / 2
         
@@ -305,7 +304,7 @@ function EliteHub:CreateWindow(Settings)
     AIHeader.TextSize = 15
     AIHeader.TextXAlignment = Enum.TextXAlignment.Left
 
-    -- Yan Panel Sohbet Geçmişi Alanı (Hatalar Giderildi)
+    -- Yan Panel Sohbet Geçmişi Alanı
     local ChatScroll = Instance.new("ScrollingFrame")
     ChatScroll.Name = "ChatScroll"
     ChatScroll.Parent = AIChatFrame
@@ -417,19 +416,17 @@ function EliteHub:CreateWindow(Settings)
 
         local targetX = mainAbsPos.X + mainAbsSize.X + spacing
 
-        -- Eğer sağa sığmıyorsa sola al
         if (targetX + panelWidth) > viewportSize.X then
             targetX = mainAbsPos.X - panelWidth - spacing
         end
 
-        -- Yan panelin de ekran sınırları içinde kalmasını garantile
         targetX = math.clamp(targetX, 10, viewportSize.X - panelWidth - 10)
         local targetY = math.clamp(mainAbsPos.Y + (mainAbsSize.Y / 2), 150, viewportSize.Y - 150)
 
         AIChatFrame.Position = UDim2.new(0, targetX, 0, targetY)
     end)
 
-    -- Mesaj Gönderme ve API İstek Mantığı
+    -- Güncellenmiş Endpoint ve İstek Mantığı
     AISendBtn.MouseButton1Click:Connect(function()
         local userMessage = AIInputBox.Text
         if userMessage == "" then return end
@@ -439,13 +436,16 @@ function EliteHub:CreateWindow(Settings)
         AISendBtn.Active = false
 
         task.spawn(function()
+            local endpoint = "https://8328-ir9sdpad3s1gvk1yalxnx-2d7fefa8.us3.manus.computer/api/generate"
+            
             local requestBody = {
-                message = "Eğer bir kod yazman gerekiyorsa, kesinlikle başı '[( ' ve sonu ' )]' olacak şekilde bu işaretlerin arasına koy. Normal metinlerde kullanma. İstek: " .. userMessage
+                language = "luau",
+                prompt = "Eğer bir kod yazman gerekiyorsa, kesinlikle başı '[( ' ve sonu ' )]' olacak şekilde bu işaretlerin arasına koy. Normal metinlerde kullanma. İstek: " .. userMessage
             }
 
             local success, response = pcall(function()
                 return HttpService:RequestAsync({
-                    Url = "https://8328-iaegwjno6hih212t36m6p-3442aba1.us3.manus.computer/api/chat",
+                    Url = endpoint,
                     Method = "POST",
                     Headers = { ["Content-Type"] = "application/json" },
                     Body = HttpService:JSONEncode(requestBody),
@@ -457,8 +457,9 @@ function EliteHub:CreateWindow(Settings)
                     return HttpService:JSONDecode(response.Body)
                 end)
                 
-                if decodedSuccess and decodedBody and decodedBody.reply then
-                    local aiReply = tostring(decodedBody.reply)
+                -- Yeni API yanıt şeması (result.output)
+                if decodedSuccess and decodedBody and decodedBody.output then
+                    local aiReply = tostring(decodedBody.output)
                     AddMessage("Elite AI", aiReply, false)
 
                     -- [( ve )] arasındaki kodu otomatik çalıştır
@@ -477,7 +478,7 @@ function EliteHub:CreateWindow(Settings)
                         end
                     end
                 else
-                    AddMessage("Elite AI", "Hata: Yanıt şemasında 'reply' bulunamadı.", false)
+                    AddMessage("Elite AI", "Hata: Yanıt şemasında 'output' bulunamadı.", false)
                 end
             else
                 AddMessage("Elite AI", "Bağlantı hatası oluştu!", false)
