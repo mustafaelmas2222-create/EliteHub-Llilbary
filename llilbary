@@ -1,5 +1,5 @@
 -- ========================================================
--- SYNAPSE HUB - Animated UI Library (Smooth Click Physics)
+-- SYNAPSE HUB - Final Animated UI Library
 -- ========================================================
 
 local SynapseHub = {}
@@ -17,18 +17,15 @@ function SynapseHub:CreateWindow(Settings)
     Settings = Settings or {}
     local WindowName = Settings.Name or "SYNAPSE HUB"
     
-    -- Eski GUI Temizliği
     if CoreGui:FindFirstChild("SynapseHubLibrary") then
         CoreGui.SynapseHubLibrary:Destroy()
     end
 
-    -- ScreenGui
     local ScreenGui = Instance.new("ScreenGui")
     ScreenGui.Name = "SynapseHubLibrary"
     ScreenGui.Parent = CoreGui
     ScreenGui.ResetOnSpawn = false
 
-    -- Ana Gövde Panel (480x320)
     local Main = Instance.new("Frame")
     Main.Name = "Main"
     Main.Parent = ScreenGui
@@ -43,7 +40,6 @@ function SynapseHub:CreateWindow(Settings)
     MainCorner.CornerRadius = UDim.new(0, 20)
     MainCorner.Parent = Main
 
-    -- Dokunmayı Arkaya Geçirmeyen Modal Siper
     local ModalBlocker = Instance.new("TextButton")
     ModalBlocker.Name = "ModalBlocker"
     ModalBlocker.Parent = Main
@@ -52,7 +48,6 @@ function SynapseHub:CreateWindow(Settings)
     ModalBlocker.Text = ""
     ModalBlocker.Modal = true
 
-    -- Arka Plan Gölgesi
     local Shadow = Instance.new("ImageLabel")
     Shadow.Name = "Shadow"
     Shadow.Parent = Main
@@ -65,7 +60,6 @@ function SynapseHub:CreateWindow(Settings)
     Shadow.ImageTransparency = 0.5
     Shadow.ZIndex = 0
 
-    -- UI Stroke (Çerçeve Parlaması)
     local MainStroke = Instance.new("UIStroke")
     MainStroke.Parent = Main
     MainStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
@@ -80,7 +74,6 @@ function SynapseHub:CreateWindow(Settings)
     StrokeGradient.Rotation = 45
     StrokeGradient.Parent = MainStroke
 
-    -- İçerik Kapsayıcısı
     local Content = Instance.new("Frame")
     Content.Name = "Content"
     Content.Parent = Main
@@ -93,7 +86,6 @@ function SynapseHub:CreateWindow(Settings)
     ContentCorner.CornerRadius = UDim.new(0, 20)
     ContentCorner.Parent = Content
 
-    -- Header (Üst Alan)
     local Header = Instance.new("Frame")
     Header.Name = "Header"
     Header.Parent = Content
@@ -120,7 +112,6 @@ function SynapseHub:CreateWindow(Settings)
     })
     TitleGradient.Parent = Title
 
-    -- Kapatma (X) Butonu
     local CloseBtn = Instance.new("TextButton")
     CloseBtn.Name = "CloseBtn"
     CloseBtn.Parent = Header
@@ -144,9 +135,7 @@ function SynapseHub:CreateWindow(Settings)
         ScreenGui:Destroy()
     end)
 
-    -- Sorunsuz Sürükleme (Draggable) Mantığı
     local dragging, dragStart, startPos
-    
     Header.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
             dragging = true
@@ -168,7 +157,6 @@ function SynapseHub:CreateWindow(Settings)
         end
     end)
 
-    -- İçerik Kapsayıcısı
     local Container = Instance.new("ScrollingFrame")
     Container.Name = "Container"
     Container.Parent = Content
@@ -187,7 +175,6 @@ function SynapseHub:CreateWindow(Settings)
     UIList.Padding = UDim.new(0, 8)
     UIList.HorizontalAlignment = Enum.HorizontalAlignment.Center
 
-    -- Profil Alt Şeridi
     local UserFooter = Instance.new("Frame")
     UserFooter.Name = "UserFooter"
     UserFooter.Parent = Content
@@ -219,7 +206,7 @@ function SynapseHub:CreateWindow(Settings)
     UserName.TextSize = 12
     UserName.TextXAlignment = Enum.TextXAlignment.Left
 
-    local StatusText = Instance.new("TextLabel")
+    local StatusText = Instance.textLabel and Instance.new("TextLabel") or Instance.new("TextLabel")
     StatusText.Name = "StatusText"
     StatusText.Parent = UserFooter
     StatusText.Position = UDim2.new(1, -90, 0, 0)
@@ -231,7 +218,6 @@ function SynapseHub:CreateWindow(Settings)
     StatusText.TextSize = 10
     StatusText.TextXAlignment = Enum.TextXAlignment.Right
 
-    -- Açılış Animasyonu
     Main.Size = UDim2.new(0, 0, 0, 0)
     Shadow.ImageTransparency = 1
 
@@ -243,10 +229,9 @@ function SynapseHub:CreateWindow(Settings)
         ImageTransparency = 0.5
     }):Play()
 
-    -- Bileşenler Objesi
     local WindowElements = {}
 
-    -- 1. BUTTON (Basma Animasyonlu)
+    -- DÜZELTİLEN BUTTON (Basma Efekti ve Ölçeklendirme Eklendi)
     function WindowElements:CreateButton(Settings)
         Settings = Settings or {}
         local btn = Instance.new("TextButton")
@@ -280,20 +265,19 @@ function SynapseHub:CreateWindow(Settings)
             TweenService:Create(stroke, TweenInfo.new(0.15), {Color = Color3.fromRGB(45, 25, 70), Transparency = 0.4}):Play()
         end)
 
-        -- Basma (Click) Animasyonu
+        -- GERÇEKÇİ BASMA (SCALE) HİSSİYATI
         btn.MouseButton1Down:Connect(function()
-            TweenService:Create(btn, TweenInfo.new(0.08), {Size = UDim2.new(0.97, 0, 0, 37)}):Play()
+            TweenService:Create(btn, TweenInfo.new(0.08, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Size = UDim2.new(0.96, 0, 0, 36)}):Play()
         end)
 
         btn.MouseButton1Up:Connect(function()
-            TweenService:Create(btn, TweenInfo.new(0.1), {Size = UDim2.new(1, 0, 0, 40)}):Play()
+            TweenService:Create(btn, TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Size = UDim2.new(1, 0, 0, 40)}):Play()
             pcall(Settings.Callback or function() end)
         end)
 
         return btn
     end
 
-    -- 2. TOGGLE (Basma Animasyonlu)
     function WindowElements:CreateToggle(Settings)
         Settings = Settings or {}
         local toggled = Settings.Default or false
@@ -348,9 +332,8 @@ function SynapseHub:CreateWindow(Settings)
         circleCorner.CornerRadius = UDim.new(1, 0)
         circleCorner.Parent = circle
 
-        -- Basma Animasyonu
         frame.MouseButton1Down:Connect(function()
-            TweenService:Create(frame, TweenInfo.new(0.08), {Size = UDim2.new(0.97, 0, 0, 37)}):Play()
+            TweenService:Create(frame, TweenInfo.new(0.08), {Size = UDim2.new(0.96, 0, 0, 36)}):Play()
         end)
 
         frame.MouseButton1Up:Connect(function()
