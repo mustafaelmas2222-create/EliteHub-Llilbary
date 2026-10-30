@@ -1,5 +1,5 @@
 -- ========================================================
--- SYNAPSE HUB - SubWindow Supported UI Library
+-- SYNAPSE HUB - Stable UI Library (Fixed Drag & Visibility)
 -- ========================================================
 
 local SynapseHub = {}
@@ -99,6 +99,7 @@ function SynapseHub:CreateWindow(Settings)
     Header.Parent = Content
     Header.Size = UDim2.new(1, 0, 0, 50)
     Header.BackgroundTransparency = 1
+    Header.ZIndex = 3
 
     local Title = Instance.new("TextLabel")
     Title.Name = "Title"
@@ -131,6 +132,7 @@ function SynapseHub:CreateWindow(Settings)
     CloseBtn.TextColor3 = Color3.fromRGB(170, 150, 200)
     CloseBtn.TextSize = 15
     CloseBtn.AutoButtonColor = false
+    CloseBtn.ZIndex = 4
 
     CloseBtn.MouseEnter:Connect(function()
         TweenService:Create(CloseBtn, TweenInfo.new(0.2), {TextColor3 = Color3.fromRGB(255, 70, 90)}):Play()
@@ -139,88 +141,51 @@ function SynapseHub:CreateWindow(Settings)
         TweenService:Create(CloseBtn, TweenInfo.new(0.2), {TextColor3 = Color3.fromRGB(170, 150, 200)}):Play()
     end)
     CloseBtn.MouseButton1Click:Connect(function()
-        local closeTween = TweenService:Create(Main, TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.In), {Size = UDim2.new(0, 0, 0, 0)})
-        TweenService:Create(Shadow, TweenInfo.new(0.15), {ImageTransparency = 1}):Play()
-        closeTween:Play()
-        closeTween.Completed:Wait()
         ScreenGui:Destroy()
     end)
 
-    -- Sürükleme Mantığı
-    local dragging = false
-    local dragInput = nil
-    local dragStart = nil
-    local startPos = nil
-    local targetPos = Main.Position
-
+    -- Sorunsuz Sürükleme (Draggable) Mantığı
+    local dragging, dragInput, dragStart, startPos
+    
     Header.InputBegan:Connect(function(input)
-        if (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) and not dragging then
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
             dragging = true
-            dragInput = input
             dragStart = input.Position
             startPos = Main.Position
-            targetPos = Main.Position
-
-            local conn
-            conn = input.Changed:Connect(function()
+            
+            input.Changed:Connect(function()
                 if input.UserInputState == Enum.UserInputState.End then
                     dragging = false
-                    dragInput = nil
-                    conn:Disconnect()
                 end
             end)
         end
     end)
 
     UserInputService.InputChanged:Connect(function(input)
-        if dragging and input == dragInput then
+        if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
             local delta = input.Position - dragStart
-            targetPos = UDim2.new(
-                startPos.X.Scale, 
-                startPos.X.Offset + delta.X, 
-                startPos.Y.Scale, 
-                startPos.Y.Offset + delta.Y
-            )
+            Main.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
         end
     end)
 
-    RunService.RenderStepped:Connect(function()
-        local viewportSize = workspace.CurrentCamera.ViewportSize
-        local currentPos = Main.Position
-        local halfW = Main.AbsoluteSize.X / 2
-        local halfH = Main.AbsoluteSize.Y / 2
-        
-        local clampedX = math.clamp(currentPos.X.Offset, halfW, viewportSize.X - halfW)
-        local clampedY = math.clamp(currentPos.Y.Offset, halfH, viewportSize.Y - halfH)
-        
-        targetPos = UDim2.new(0, clampedX, 0, clampedY)
-
-        if dragging or (Main.Position ~= targetPos) then
-            Main.Position = Main.Position:Lerp(targetPos, 0.25)
-        end
-    end)
-
-    -- Ana İçerik Kapsayıcısı
+    -- İçerik Kapsayıcısı (ScrollingFrame) - Elementlerin görünmeme sorunu burada çözüldü
     local Container = Instance.new("ScrollingFrame")
     Container.Name = "Container"
     Container.Parent = Content
     Container.BackgroundTransparency = 1
-    Container.Position = UDim2.new(0, 16, 0, 52)
-    Container.Size = UDim2.new(1, -32, 0, 210)
+    Container.Position = UDim2.new(0, 16, 0, 55)
+    Container.Size = UDim2.new(1, -32, 0, 215)
     Container.ScrollBarThickness = 3
     Container.ScrollBarImageColor3 = Color3.fromRGB(120, 60, 180)
     Container.BorderSizePixel = 0
     Container.CanvasSize = UDim2.new(0, 0, 0, 0)
+    Container.AutomaticCanvasSize = Enum.AutomaticSize.Y
 
     local UIList = Instance.new("UIListLayout")
     UIList.Parent = Container
     UIList.SortOrder = Enum.SortOrder.LayoutOrder
     UIList.Padding = UDim.new(0, 8)
     UIList.HorizontalAlignment = Enum.HorizontalAlignment.Center
-
-    UIList:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-        Container.CanvasSize = UDim2.new(0, 0, 0, UIList.AbsoluteContentSize.Y + 10)
-    end)
 
     -- Profil Alt Şeridi
     local UserFooter = Instance.new("Frame")
@@ -281,7 +246,6 @@ function SynapseHub:CreateWindow(Settings)
     -- Bileşenler Objesi
     local WindowElements = {}
 
-    -- Standart Elemanlar (Button, Toggle, Slider, TextBox, Label)
     function WindowElements:CreateButton(Settings)
         Settings = Settings or {}
         local btn = Instance.new("TextButton")
@@ -534,21 +498,19 @@ function SynapseHub:CreateWindow(Settings)
         return labelFrame
     end
 
-    -- --- YENİ ÖZELLİK: AYRI ALT MENÜ (SUB-WINDOW) ---
     function WindowElements:CreateSubWindow(SubSettings)
         SubSettings = SubSettings or {}
         local SubName = SubSettings.Name or "SUB WINDOW"
 
-        -- Ayrı Alt Menü Çerçevesi
         local SubMain = Instance.new("Frame")
         SubMain.Name = "SubWindow"
         SubMain.Parent = ScreenGui
         SubMain.AnchorPoint = Vector2.new(0.5, 0.5)
-        SubMain.Position = UDim2.new(0.5, 120, 0.5, 0) -- Ana menünün biraz yanında başlar
+        SubMain.Position = UDim2.new(0.5, 140, 0.5, 0)
         SubMain.Size = UDim2.new(0, 360, 0, 260)
         SubMain.BackgroundColor3 = Color3.fromRGB(8, 6, 12)
         SubMain.BackgroundTransparency = 0.15
-        SubMain.Visible = false -- Başlangıçta gizli
+        SubMain.Visible = false
         SubMain.ZIndex = 10
 
         local SubCorner = Instance.new("UICorner")
@@ -560,12 +522,12 @@ function SynapseHub:CreateWindow(Settings)
         SubStroke.Color = Color3.fromRGB(120, 50, 190)
         SubStroke.Thickness = 1.4
 
-        -- Alt Menü Header
         local SubHeader = Instance.new("Frame")
         SubHeader.Name = "SubHeader"
         SubHeader.Parent = SubMain
         SubHeader.Size = UDim2.new(1, 0, 0, 44)
         SubHeader.BackgroundTransparency = 1
+        SubHeader.ZIndex = 11
 
         local SubTitle = Instance.new("TextLabel")
         SubTitle.Parent = SubHeader
@@ -587,12 +549,12 @@ function SynapseHub:CreateWindow(Settings)
         SubClose.Text = "X"
         SubClose.TextColor3 = Color3.fromRGB(170, 150, 200)
         SubClose.TextSize = 13
+        SubClose.ZIndex = 12
 
         SubClose.MouseButton1Click:Connect(function()
             SubMain.Visible = false
         end)
 
-        -- Alt Menü İçerik Listesi
         local SubContainer = Instance.new("ScrollingFrame")
         SubContainer.Parent = SubMain
         SubContainer.BackgroundTransparency = 1
@@ -601,6 +563,7 @@ function SynapseHub:CreateWindow(Settings)
         SubContainer.ScrollBarThickness = 2
         SubContainer.ScrollBarImageColor3 = Color3.fromRGB(120, 60, 180)
         SubContainer.BorderSizePixel = 0
+        SubContainer.AutomaticCanvasSize = Enum.AutomaticSize.Y
 
         local SubList = Instance.new("UIListLayout")
         SubList.Parent = SubContainer
@@ -608,11 +571,6 @@ function SynapseHub:CreateWindow(Settings)
         SubList.Padding = UDim.new(0, 6)
         SubList.HorizontalAlignment = Enum.HorizontalAlignment.Center
 
-        SubList:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-            SubContainer.CanvasSize = UDim2.new(0, 0, 0, SubList.AbsoluteContentSize.Y + 10)
-        end)
-
-        -- Alt menüyü açıp kapamak için bir kontrol tablosu döndürüyoruz
         local SubAPI = {}
         function SubAPI:Toggle()
             SubMain.Visible = not SubMain.Visible
