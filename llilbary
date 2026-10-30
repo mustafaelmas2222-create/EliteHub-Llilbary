@@ -33,7 +33,7 @@ function SynapseHub:CreateWindow(Settings)
     Main.Position = UDim2.new(0.5, 0, 0.5, 0)
     Main.Size = UDim2.new(0, 480, 0, 320)
     Main.BackgroundColor3 = Color3.fromRGB(8, 6, 12)
-    Main.BackgroundTransparency = 0.15
+    Main.BackgroundTransparency = 1 -- Animasyonlu açılış için şeffaf başlatıldı
     Main.ClipsDescendants = false
 
     local MainCorner = Instance.new("UICorner")
@@ -57,7 +57,7 @@ function SynapseHub:CreateWindow(Settings)
     Shadow.BackgroundTransparency = 1
     Shadow.Image = "rbxassetid://6014261993"
     Shadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
-    Shadow.ImageTransparency = 0.5
+    Shadow.ImageTransparency = 1
     Shadow.ZIndex = 0
 
     local MainStroke = Instance.new("UIStroke")
@@ -132,18 +132,18 @@ function SynapseHub:CreateWindow(Settings)
         TweenService:Create(CloseBtn, TweenInfo.new(0.2), {TextColor3 = Color3.fromRGB(170, 150, 200)}):Play()
     end)
 
-    -- ANİMASYONLU KAPANIŞ (Kapanırken küçülüp yok olma)
+    -- ANİMASYONLU YUMUŞAK KAPANIŞ (Scale + Fade)
     CloseBtn.MouseButton1Click:Connect(function()
-        TweenService:Create(Main, TweenInfo.new(0.25, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
+        TweenService:Create(Main, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
             Size = UDim2.new(0, 0, 0, 0),
             BackgroundTransparency = 1
         }):Play()
-        TweenService:Create(Shadow, TweenInfo.new(0.25), {ImageTransparency = 1}):Play()
-        task.wait(0.25)
+        TweenService:Create(Shadow, TweenInfo.new(0.3), {ImageTransparency = 1}):Play()
+        task.wait(0.3)
         ScreenGui:Destroy()
     end)
 
-    -- Multi-Touch Kilitli & Kusursuz Lerp Sürükleme Fiziği
+    -- KUSURSUZ LERP SÜRÜKLEME FİZİĞİ (Anksiyete yapmayan multi-touch kilitli)
     local dragging = false
     local activeTouch = nil
     local dragStart = nil
@@ -179,6 +179,7 @@ function SynapseHub:CreateWindow(Settings)
         end
     end)
 
+    -- Sürüklerken ve bırakırken yağ gibi süzülen Lerp Fiziği
     RunService.RenderStepped:Connect(function()
         local viewportSize = workspace.CurrentCamera.ViewportSize
         local halfW = Main.AbsoluteSize.X / 2
@@ -190,7 +191,7 @@ function SynapseHub:CreateWindow(Settings)
         targetPos = UDim2.new(0, clampedX, 0, clampedY)
 
         if dragging then
-            Main.Position = Main.Position:Lerp(targetPos, 0.7)
+            Main.Position = Main.Position:Lerp(targetPos, 0.75)
         else
             Main.Position = Main.Position:Lerp(targetPos, 0.2)
         end
@@ -257,12 +258,13 @@ function SynapseHub:CreateWindow(Settings)
     StatusText.TextSize = 10
     StatusText.TextXAlignment = Enum.TextXAlignment.Right
 
-    -- ANİMASYONLU AÇILIŞ (Pop-up büyüme efekti)
+    -- ANİMASYONLU AÇILIŞ (Büyüyerek süzülme efekti)
     Main.Size = UDim2.new(0, 0, 0, 0)
     Shadow.ImageTransparency = 1
 
     TweenService:Create(Main, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
-        Size = UDim2.new(0, 480, 0, 320)
+        Size = UDim2.new(0, 480, 0, 320),
+        BackgroundTransparency = 0.15
     }):Play()
 
     TweenService:Create(Shadow, TweenInfo.new(0.4), {
@@ -271,7 +273,6 @@ function SynapseHub:CreateWindow(Settings)
 
     local WindowElements = {}
 
-    -- 1. ANİMASYONLU BUTTON (Hover, Scale Basma Efekti)
     function WindowElements:CreateButton(Settings)
         Settings = Settings or {}
         local btn = Instance.new("TextButton")
@@ -317,7 +318,6 @@ function SynapseHub:CreateWindow(Settings)
         return btn
     end
 
-    -- 2. ANİMASYONLU TOGGLE (Kayma ve Basma Efekti)
     function WindowElements:CreateToggle(Settings)
         Settings = Settings or {}
         local toggled = Settings.Default or false
@@ -387,7 +387,6 @@ function SynapseHub:CreateWindow(Settings)
         return frame
     end
 
-    -- 3. ANİMASYONLU SLIDER (Tık Tık Snapping + Akıcı Kaydırma)
     function WindowElements:CreateSlider(Settings)
         Settings = Settings or {}
         local Min = Settings.Min or 0
@@ -466,7 +465,6 @@ function SynapseHub:CreateWindow(Settings)
             
             local exactPos = (snappedVal - Min) / (Max - Min)
             
-            -- Yumuşak geçiş animasyonuyla dolum çubuğu hareketi
             TweenService:Create(sliderFill, TweenInfo.new(0.08, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
                 Size = UDim2.new(exactPos, 0, 1, 0)
             }):Play()
@@ -501,7 +499,6 @@ function SynapseHub:CreateWindow(Settings)
         return frame
     end
 
-    -- 4. ANİMASYONLU TEXTBOX (Yazı yazarken odaklanma / parlama efekti)
     function WindowElements:CreateTextBox(Settings)
         Settings = Settings or {}
         local frame = Instance.new("Frame")
@@ -552,9 +549,9 @@ function SynapseHub:CreateWindow(Settings)
         local boxStroke = Instance.new("UIStroke")
         boxStroke.Parent = textBox
         boxStroke.Color = Color3.fromRGB(130, 60, 200)
-        boxStroke.Transparency = 1 -- Başlangıçta görünmez
+        boxStroke.Transparency = 1
 
-        -- Yazı yazmak için tıklandığında (Focus) parıldama animasyonu
+        -- Yazı yazarken odaklanma (Focus) parıl parıl animasyonu
         textBox.Focused:Connect(function()
             TweenService:Create(textBox, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(32, 22, 50)}):Play()
             TweenService:Create(boxStroke, TweenInfo.new(0.2), {Transparency = 0}):Play()
@@ -588,7 +585,6 @@ function SynapseHub:CreateWindow(Settings)
         return labelFrame
     end
 
-    -- 5. ANİMASYONLU SUBWINDOW (Açılış/Kapanış Pop-up Efektli)
     function WindowElements:CreateSubWindow(SubSettings)
         SubSettings = SubSettings or {}
         local SubName = SubSettings.Name or "SUB WINDOW"
