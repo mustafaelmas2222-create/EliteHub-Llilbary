@@ -1,5 +1,5 @@
 -- ========================================================
--- SYNAPSE HUB - Stable UI Library (Fixed Drag & Visibility)
+-- SYNAPSE HUB - Animated UI Library (Smooth Click Physics)
 -- ========================================================
 
 local SynapseHub = {}
@@ -145,7 +145,7 @@ function SynapseHub:CreateWindow(Settings)
     end)
 
     -- Sorunsuz Sürükleme (Draggable) Mantığı
-    local dragging, dragInput, dragStart, startPos
+    local dragging, dragStart, startPos
     
     Header.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
@@ -168,7 +168,7 @@ function SynapseHub:CreateWindow(Settings)
         end
     end)
 
-    -- İçerik Kapsayıcısı (ScrollingFrame) - Elementlerin görünmeme sorunu burada çözüldü
+    -- İçerik Kapsayıcısı
     local Container = Instance.new("ScrollingFrame")
     Container.Name = "Container"
     Container.Parent = Content
@@ -246,6 +246,7 @@ function SynapseHub:CreateWindow(Settings)
     -- Bileşenler Objesi
     local WindowElements = {}
 
+    -- 1. BUTTON (Basma Animasyonlu)
     function WindowElements:CreateButton(Settings)
         Settings = Settings or {}
         local btn = Instance.new("TextButton")
@@ -269,12 +270,30 @@ function SynapseHub:CreateWindow(Settings)
         stroke.Thickness = 1.2
         stroke.Transparency = 0.4
 
-        btn.MouseButton1Click:Connect(function()
+        btn.MouseEnter:Connect(function()
+            TweenService:Create(btn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(32, 18, 52), TextColor3 = Color3.fromRGB(255, 255, 255)}):Play()
+            TweenService:Create(stroke, TweenInfo.new(0.15), {Color = Color3.fromRGB(130, 60, 200), Transparency = 0}):Play()
+        end)
+
+        btn.MouseLeave:Connect(function()
+            TweenService:Create(btn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(14, 10, 22), TextColor3 = Color3.fromRGB(200, 190, 220)}):Play()
+            TweenService:Create(stroke, TweenInfo.new(0.15), {Color = Color3.fromRGB(45, 25, 70), Transparency = 0.4}):Play()
+        end)
+
+        -- Basma (Click) Animasyonu
+        btn.MouseButton1Down:Connect(function()
+            TweenService:Create(btn, TweenInfo.new(0.08), {Size = UDim2.new(0.97, 0, 0, 37)}):Play()
+        end)
+
+        btn.MouseButton1Up:Connect(function()
+            TweenService:Create(btn, TweenInfo.new(0.1), {Size = UDim2.new(1, 0, 0, 40)}):Play()
             pcall(Settings.Callback or function() end)
         end)
+
         return btn
     end
 
+    -- 2. TOGGLE (Basma Animasyonlu)
     function WindowElements:CreateToggle(Settings)
         Settings = Settings or {}
         local toggled = Settings.Default or false
@@ -329,12 +348,19 @@ function SynapseHub:CreateWindow(Settings)
         circleCorner.CornerRadius = UDim.new(1, 0)
         circleCorner.Parent = circle
 
-        frame.MouseButton1Click:Connect(function()
+        -- Basma Animasyonu
+        frame.MouseButton1Down:Connect(function()
+            TweenService:Create(frame, TweenInfo.new(0.08), {Size = UDim2.new(0.97, 0, 0, 37)}):Play()
+        end)
+
+        frame.MouseButton1Up:Connect(function()
+            TweenService:Create(frame, TweenInfo.new(0.1), {Size = UDim2.new(1, 0, 0, 40)}):Play()
             toggled = not toggled
             TweenService:Create(switch, TweenInfo.new(0.2), {BackgroundColor3 = toggled and Color3.fromRGB(130, 60, 200) or Color3.fromRGB(25, 18, 38)}):Play()
             TweenService:Create(circle, TweenInfo.new(0.2), {Position = toggled and UDim2.new(1, -18, 0.5, 0) or UDim2.new(0, 2, 0.5, 0)}):Play()
             pcall(Settings.Callback or function() end, toggled)
         end)
+
         return frame
     end
 
