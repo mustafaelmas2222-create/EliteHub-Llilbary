@@ -1,5 +1,5 @@
 -- ========================================================
--- SYNAPSE HUB - Multi-Touch Safe & Lerp Drag UI Library
+-- SYNAPSE HUB - Anti-Flicker & Stable Multi-Touch Library
 -- ========================================================
 
 local SynapseHub = {}
@@ -135,17 +135,17 @@ function SynapseHub:CreateWindow(Settings)
         ScreenGui:Destroy()
     end)
 
-    -- MULTI-TOUCH KORUMALI & ÇAKIŞMAYAN SÜRÜKLEME MİMARİSİ
+    -- KESİN ÇÖZÜM: Kilitli & Akıcı Sürükleme Mantığı
     local dragging = false
-    local activeInput = nil
+    local activeTouch = nil
     local dragStart = nil
     local startPos = nil
     local targetPos = Main.Position
 
     Header.InputBegan:Connect(function(input)
-        if (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) and not activeInput then
+        if (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) and not activeTouch then
             dragging = true
-            activeInput = input
+            activeTouch = input
             dragStart = input.Position
             startPos = Main.Position
             targetPos = Main.Position
@@ -153,14 +153,14 @@ function SynapseHub:CreateWindow(Settings)
     end)
 
     UserInputService.InputEnded:Connect(function(input)
-        if input == activeInput then
+        if input == activeTouch then
             dragging = false
-            activeInput = nil
+            activeTouch = nil
         end
     end)
 
     UserInputService.InputChanged:Connect(function(input)
-        if dragging and input == activeInput then
+        if dragging and input == activeTouch then
             local delta = input.Position - dragStart
             targetPos = UDim2.new(
                 startPos.X.Scale, 
@@ -171,7 +171,7 @@ function SynapseHub:CreateWindow(Settings)
         end
     end)
 
-    -- RenderStepped ile Güvenli Lerp Takibi (Kafayı yeme korumalı)
+    -- Kararlı Lerp Fiziği
     RunService.RenderStepped:Connect(function()
         local viewportSize = workspace.CurrentCamera.ViewportSize
         local halfW = Main.AbsoluteSize.X / 2
@@ -183,9 +183,9 @@ function SynapseHub:CreateWindow(Settings)
         targetPos = UDim2.new(0, clampedX, 0, clampedY)
 
         if dragging then
-            Main.Position = Main.Position:Lerp(targetPos, 0.6)
+            Main.Position = Main.Position:Lerp(targetPos, 0.7)
         else
-            Main.Position = Main.Position:Lerp(targetPos, 0.25)
+            Main.Position = Main.Position:Lerp(targetPos, 0.2)
         end
     end)
 
