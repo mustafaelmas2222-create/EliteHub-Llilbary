@@ -1,5 +1,5 @@
 -- ========================================================
--- SYNAPSE HUB - 100% Fully Animated & Fluid UI Library
+-- SYNAPSE HUB - Cinematic Intro & 100% Fully Animated Library
 -- ========================================================
 
 local SynapseHub = {}
@@ -10,6 +10,7 @@ local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 local CoreGui = game:GetService("CoreGui")
+local Lighting = game:GetService("Lighting")
 
 local LocalPlayer = Players.LocalPlayer
 
@@ -20,18 +21,98 @@ function SynapseHub:CreateWindow(Settings)
     if CoreGui:FindFirstChild("SynapseHubLibrary") then
         CoreGui.SynapseHubLibrary:Destroy()
     end
+    if Lighting:FindFirstChild("SynapseHubBlur") then
+        Lighting.SynapseHubBlur:Destroy()
+    end
 
     local ScreenGui = Instance.new("ScreenGui")
     ScreenGui.Name = "SynapseHubLibrary"
     ScreenGui.Parent = CoreGui
     ScreenGui.ResetOnSpawn = false
 
+    -- 1. SİNEMATİK AÇILIŞ / BUĞULU ARKAPLAN VE LOGO EKRANI
+    local IntroGui = Instance.new("Frame")
+    IntroGui.Name = "IntroGui"
+    IntroGui.Parent = ScreenGui
+    IntroGui.Size = UDim2.new(1, 0, 1, 0)
+    IntroGui.BackgroundColor3 = Color3.fromRGB(5, 4, 8)
+    IntroGui.BackgroundTransparency = 0.3
+    IntroGui.ZIndex = 100
+
+    -- Arkaplan Buğulanma Efekti (BlurEffect)
+    local BlurEffect = Instance.new("BlurEffect")
+    BlurEffect.Name = "SynapseHubBlur"
+    BlurEffect.Parent = Lighting
+    BlurEffect.Size = 0 -- Başlangıç sıfır
+
+    -- Yuvarlak Maske / Çerçeve (Kişinin attığı logo için yuvarlak yapı)
+    local LogoContainer = Instance.new("Frame")
+    LogoContainer.Name = "LogoContainer"
+    LogoContainer.Parent = IntroGui
+    LogoContainer.AnchorPoint = Vector2.new(0.5, 0.5)
+    LogoContainer.Position = UDim2.new(0.5, 0, 0.5, 0)
+    LogoContainer.Size = UDim2.new(0, 130, 0, 130)
+    LogoContainer.BackgroundTransparency = 1
+    LogoContainer.ClipsDescendants = true
+    LogoContainer.ZIndex = 101
+
+    local LogoCorner = Instance.new("UICorner")
+    LogoCorner.CornerRadius = UDim.new(1, 0) -- Tam yuvarlak
+    LogoCorner.Parent = LogoContainer
+
+    local LogoImage = Instance.new("ImageLabel")
+    LogoImage.Name = "LogoImage"
+    LogoImage.Parent = LogoContainer
+    LogoImage.Size = UDim2.new(1, 0, 1, 0)
+    LogoImage.BackgroundTransparency = 1
+    -- Kullanıcının sağladığı görsel linki (Asset ID veya doğrudan rbxthumb/url desteği)
+    LogoImage.Image = "rbxassetid://10878510125" -- Örnek / Yedek ID (Görsel bağlantısına göre güncellenebilir)
+    -- Alternatif olarak doğrudan direkt link veya rbxasset:// kullanılabilir
+    pcall(function()
+        LogoImage.Image = "https://i.ibb.co/VWWhYSqY/MG-20261025-154838-506.jpg"
+    end)
+    LogoImage.ZIndex = 102
+
+    -- AÇILIŞ ANİMASYONU BAŞLANGICI
+    -- Blur ve karartma ekrana girer
+    TweenService:Create(BlurEffect, TweenInfo.new(0.6, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {Size = 24}):Play()
+    TweenService:Create(IntroGui, TweenInfo.new(0.4), {BackgroundTransparency = 0.2}):Play()
+
+    -- 1.5 Saniye logo ekranda durduktan sonra yuvarlak küçülerek patlama/gitme efekti
+    task.spawn(function()
+        task.wait(1.4)
+        -- Logoyu küçült ve şeffaflastır
+        TweenService:Create(LogoContainer, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
+            Size = UDim2.new(0, 0, 0, 0),
+            Rotation = 90
+        }):Play()
+        TweenService:Create(LogoImage, TweenInfo.new(0.4), {ImageTransparency = 1}):Play()
+        
+        -- Arkaplan blurunu ve intro perdesini kaldır
+        TweenService:Create(BlurEffect, TweenInfo.new(0.5), {Size = 0}):Play()
+        TweenService:Create(IntroGui, TweenInfo.new(0.5), {BackgroundTransparency = 1}):Play()
+        
+        task.wait(0.5)
+        BlurEffect:Destroy()
+        IntroGui:Destroy()
+
+        -- ANA MENÜYÜ ANİMASYONLA ORTaya ÇIKAR
+        TweenService:Create(Main, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+            Size = UDim2.new(0, 480, 0, 320),
+            BackgroundTransparency = 0.15
+        }):Play()
+        TweenService:Create(Shadow, TweenInfo.new(0.4), {
+            ImageTransparency = 0.5
+        }):Play()
+    end)
+
+    -- ASIL ANA MENÜ TANIMLAMALARI
     local Main = Instance.new("Frame")
     Main.Name = "Main"
     Main.Parent = ScreenGui
     Main.AnchorPoint = Vector2.new(0.5, 0.5)
     Main.Position = UDim2.new(0.5, 0, 0.5, 0)
-    Main.Size = UDim2.new(0, 0, 0, 0) -- Başlangıç sıfır (Animasyonlu açılış için)
+    Main.Size = UDim2.new(0, 0, 0, 0) -- Başlangıç sıfır (Intro bitince açılacak)
     Main.BackgroundColor3 = Color3.fromRGB(8, 6, 12)
     Main.BackgroundTransparency = 1
     Main.ClipsDescendants = false
@@ -132,8 +213,11 @@ function SynapseHub:CreateWindow(Settings)
         TweenService:Create(CloseBtn, TweenInfo.new(0.2), {TextColor3 = Color3.fromRGB(170, 150, 200)}):Play()
     end)
 
-    -- KUSURSUZ ANİMASYONLU KAPANIŞ (Küçülerek, şeffaflaşarak yok olma)
+    -- ANİMASYONLU KAPANIŞ
     CloseBtn.MouseButton1Click:Connect(function()
+        if Lighting:FindFirstChild("SynapseHubBlur") then
+            Lighting.SynapseHubBlur:Destroy()
+        end
         TweenService:Create(Main, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
             Size = UDim2.new(0, 0, 0, 0),
             BackgroundTransparency = 1
@@ -143,7 +227,7 @@ function SynapseHub:CreateWindow(Settings)
         ScreenGui:Destroy()
     end)
 
-    -- AKICI VE KUSURSUZ LERP SÜRÜKLEME FİZİĞİ
+    -- SÜRÜKLEME FİZİĞİ
     local dragging = false
     local activeTouch = nil
     local dragStart = nil
@@ -190,10 +274,8 @@ function SynapseHub:CreateWindow(Settings)
         targetPos = UDim2.new(0, clampedX, 0, clampedY)
 
         if dragging then
-            -- Parmağını/marenle sürüklerken arkasından yağ gibi gelen lerp
             Main.Position = Main.Position:Lerp(targetPos, 0.4)
         else
-            -- Bıraktığında sönümlenerek oturan lerp
             Main.Position = Main.Position:Lerp(targetPos, 0.15)
         end
     end)
@@ -258,16 +340,6 @@ function SynapseHub:CreateWindow(Settings)
     StatusText.TextColor3 = Color3.fromRGB(80, 190, 130)
     StatusText.TextSize = 10
     StatusText.TextXAlignment = Enum.TextXAlignment.Right
-
-    -- KUSURSUZ ANİMASYONLU AÇILIŞ (Büyüyerek ve netleşerek belirme)
-    TweenService:Create(Main, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
-        Size = UDim2.new(0, 480, 0, 320),
-        BackgroundTransparency = 0.15
-    }):Play()
-
-    TweenService:Create(Shadow, TweenInfo.new(0.4), {
-        ImageTransparency = 0.5
-    }):Play()
 
     local WindowElements = {}
 
@@ -497,7 +569,6 @@ function SynapseHub:CreateWindow(Settings)
         return frame
     end
 
-    -- TAM ANİMASYONLU TEXTBOX (Yazarken Odaklanma & Boyut Efekti)
     function WindowElements:CreateTextBox(Settings)
         Settings = Settings or {}
         local frame = Instance.new("Frame")
@@ -550,7 +621,6 @@ function SynapseHub:CreateWindow(Settings)
         boxStroke.Color = Color3.fromRGB(130, 60, 200)
         boxStroke.Transparency = 1
 
-        -- Yazı yazmak için tıklandığında (Focus) pürüzsüz animasyon
         textBox.Focused:Connect(function()
             TweenService:Create(textBox, TweenInfo.new(0.2), {
                 BackgroundColor3 = Color3.fromRGB(32, 22, 50),
