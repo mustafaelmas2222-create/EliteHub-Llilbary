@@ -1,5 +1,5 @@
 -- ========================================================
--- SYNAPSE HUB - Snapping Slider & Lerp Drag UI Library
+-- SYNAPSE HUB - Multi-Touch Safe & Lerp Drag UI Library
 -- ========================================================
 
 local SynapseHub = {}
@@ -135,32 +135,32 @@ function SynapseHub:CreateWindow(Settings)
         ScreenGui:Destroy()
     end)
 
-    -- SERT VE LERP'Lİ SÜRÜKLEME MİMARİSİ
+    -- MULTI-TOUCH KORUMALI & ÇAKIŞMAYAN SÜRÜKLEME MİMARİSİ
     local dragging = false
-    local dragInput = nil
+    local activeInput = nil
     local dragStart = nil
     local startPos = nil
     local targetPos = Main.Position
 
     Header.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        if (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) and not activeInput then
             dragging = true
-            dragInput = input
+            activeInput = input
             dragStart = input.Position
             startPos = Main.Position
             targetPos = Main.Position
-            
-            input.Changed:Connect(function()
-                if input.UserInputState == Enum.UserInputState.End then
-                    dragging = false
-                    dragInput = nil
-                end
-            end)
+        end
+    end)
+
+    UserInputService.InputEnded:Connect(function(input)
+        if input == activeInput then
+            dragging = false
+            activeInput = nil
         end
     end)
 
     UserInputService.InputChanged:Connect(function(input)
-        if dragging and input == dragInput then
+        if dragging and input == activeInput then
             local delta = input.Position - dragStart
             targetPos = UDim2.new(
                 startPos.X.Scale, 
@@ -171,10 +171,9 @@ function SynapseHub:CreateWindow(Settings)
         end
     end)
 
-    -- RenderStepped ile Sert ve Akıcı Lerp Takibi
+    -- RenderStepped ile Güvenli Lerp Takibi (Kafayı yeme korumalı)
     RunService.RenderStepped:Connect(function()
         local viewportSize = workspace.CurrentCamera.ViewportSize
-        local currentPos = Main.Position
         local halfW = Main.AbsoluteSize.X / 2
         local halfH = Main.AbsoluteSize.Y / 2
         
@@ -184,10 +183,8 @@ function SynapseHub:CreateWindow(Settings)
         targetPos = UDim2.new(0, clampedX, 0, clampedY)
 
         if dragging then
-            -- Sürüklerken sert ve anında tepki
             Main.Position = Main.Position:Lerp(targetPos, 0.6)
         else
-            -- Bırakıldığında yumuşak lerp sönümlemesi
             Main.Position = Main.Position:Lerp(targetPos, 0.25)
         end
     end)
