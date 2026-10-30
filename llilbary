@@ -1,5 +1,5 @@
 -- ========================================================
--- SYNAPSE HUB - Anti-Flicker & Stable Multi-Touch Library
+-- SYNAPSE HUB - 100% Fully Animated & Fluid UI Library
 -- ========================================================
 
 local SynapseHub = {}
@@ -131,11 +131,19 @@ function SynapseHub:CreateWindow(Settings)
     CloseBtn.MouseLeave:Connect(function()
         TweenService:Create(CloseBtn, TweenInfo.new(0.2), {TextColor3 = Color3.fromRGB(170, 150, 200)}):Play()
     end)
+
+    -- ANİMASYONLU KAPANIŞ (Kapanırken küçülüp yok olma)
     CloseBtn.MouseButton1Click:Connect(function()
+        TweenService:Create(Main, TweenInfo.new(0.25, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
+            Size = UDim2.new(0, 0, 0, 0),
+            BackgroundTransparency = 1
+        }):Play()
+        TweenService:Create(Shadow, TweenInfo.new(0.25), {ImageTransparency = 1}):Play()
+        task.wait(0.25)
         ScreenGui:Destroy()
     end)
 
-    -- KESİN ÇÖZÜM: Kilitli & Akıcı Sürükleme Mantığı
+    -- Multi-Touch Kilitli & Kusursuz Lerp Sürükleme Fiziği
     local dragging = false
     local activeTouch = nil
     local dragStart = nil
@@ -171,7 +179,6 @@ function SynapseHub:CreateWindow(Settings)
         end
     end)
 
-    -- Kararlı Lerp Fiziği
     RunService.RenderStepped:Connect(function()
         local viewportSize = workspace.CurrentCamera.ViewportSize
         local halfW = Main.AbsoluteSize.X / 2
@@ -250,19 +257,21 @@ function SynapseHub:CreateWindow(Settings)
     StatusText.TextSize = 10
     StatusText.TextXAlignment = Enum.TextXAlignment.Right
 
+    -- ANİMASYONLU AÇILIŞ (Pop-up büyüme efekti)
     Main.Size = UDim2.new(0, 0, 0, 0)
     Shadow.ImageTransparency = 1
 
-    TweenService:Create(Main, TweenInfo.new(0.35, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
+    TweenService:Create(Main, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
         Size = UDim2.new(0, 480, 0, 320)
     }):Play()
 
-    TweenService:Create(Shadow, TweenInfo.new(0.35), {
+    TweenService:Create(Shadow, TweenInfo.new(0.4), {
         ImageTransparency = 0.5
     }):Play()
 
     local WindowElements = {}
 
+    -- 1. ANİMASYONLU BUTTON (Hover, Scale Basma Efekti)
     function WindowElements:CreateButton(Settings)
         Settings = Settings or {}
         local btn = Instance.new("TextButton")
@@ -308,6 +317,7 @@ function SynapseHub:CreateWindow(Settings)
         return btn
     end
 
+    -- 2. ANİMASYONLU TOGGLE (Kayma ve Basma Efekti)
     function WindowElements:CreateToggle(Settings)
         Settings = Settings or {}
         local toggled = Settings.Default or false
@@ -377,6 +387,7 @@ function SynapseHub:CreateWindow(Settings)
         return frame
     end
 
+    -- 3. ANİMASYONLU SLIDER (Tık Tık Snapping + Akıcı Kaydırma)
     function WindowElements:CreateSlider(Settings)
         Settings = Settings or {}
         local Min = Settings.Min or 0
@@ -454,7 +465,12 @@ function SynapseHub:CreateWindow(Settings)
             snappedVal = math.clamp(snappedVal, Min, Max)
             
             local exactPos = (snappedVal - Min) / (Max - Min)
-            sliderFill.Size = UDim2.new(exactPos, 0, 1, 0)
+            
+            -- Yumuşak geçiş animasyonuyla dolum çubuğu hareketi
+            TweenService:Create(sliderFill, TweenInfo.new(0.08, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+                Size = UDim2.new(exactPos, 0, 1, 0)
+            }):Play()
+            
             valueLabel.Text = tostring(snappedVal)
 
             if snappedVal ~= lastSnappedVal then
@@ -485,6 +501,7 @@ function SynapseHub:CreateWindow(Settings)
         return frame
     end
 
+    -- 4. ANİMASYONLU TEXTBOX (Yazı yazarken odaklanma / parlama efekti)
     function WindowElements:CreateTextBox(Settings)
         Settings = Settings or {}
         local frame = Instance.new("Frame")
@@ -532,9 +549,23 @@ function SynapseHub:CreateWindow(Settings)
         boxCorner.CornerRadius = UDim.new(0, 6)
         boxCorner.Parent = textBox
 
-        textBox.FocusLost:Connect(function()
+        local boxStroke = Instance.new("UIStroke")
+        boxStroke.Parent = textBox
+        boxStroke.Color = Color3.fromRGB(130, 60, 200)
+        boxStroke.Transparency = 1 -- Başlangıçta görünmez
+
+        -- Yazı yazmak için tıklandığında (Focus) parıldama animasyonu
+        textBox.Focused:Connect(function()
+            TweenService:Create(textBox, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(32, 22, 50)}):Play()
+            TweenService:Create(boxStroke, TweenInfo.new(0.2), {Transparency = 0}):Play()
+        end)
+
+        textBox.FocusLost:Connect(function(enterPressed)
+            TweenService:Create(textBox, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(22, 15, 35)}):Play()
+            TweenService:Create(boxStroke, TweenInfo.new(0.2), {Transparency = 1}):Play()
             pcall(Settings.Callback or function() end, textBox.Text)
         end)
+
         return frame
     end
 
@@ -557,6 +588,7 @@ function SynapseHub:CreateWindow(Settings)
         return labelFrame
     end
 
+    -- 5. ANİMASYONLU SUBWINDOW (Açılış/Kapanış Pop-up Efektli)
     function WindowElements:CreateSubWindow(SubSettings)
         SubSettings = SubSettings or {}
         local SubName = SubSettings.Name or "SUB WINDOW"
@@ -610,8 +642,34 @@ function SynapseHub:CreateWindow(Settings)
         SubClose.TextSize = 13
         SubClose.ZIndex = 12
 
-        SubClose.MouseButton1Click:Connect(function()
+        local SubAPI = {}
+
+        function SubAPI:Open()
+            SubMain.Size = UDim2.new(0, 0, 0, 0)
+            SubMain.Visible = true
+            TweenService:Create(SubMain, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+                Size = UDim2.new(0, 360, 0, 260)
+            }):Play()
+        end
+
+        function SubAPI:Close()
+            TweenService:Create(SubMain, TweenInfo.new(0.2, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
+                Size = UDim2.new(0, 0, 0, 0)
+            }):Play()
+            task.wait(0.2)
             SubMain.Visible = false
+        end
+
+        function SubAPI:Toggle()
+            if SubMain.Visible then
+                SubAPI:Close()
+            else
+                SubAPI:Open()
+            end
+        end
+
+        SubClose.MouseButton1Click:Connect(function()
+            SubAPI:Close()
         end)
 
         local SubContainer = Instance.new("ScrollingFrame")
@@ -629,17 +687,6 @@ function SynapseHub:CreateWindow(Settings)
         SubList.SortOrder = Enum.SortOrder.LayoutOrder
         SubList.Padding = UDim.new(0, 6)
         SubList.HorizontalAlignment = Enum.HorizontalAlignment.Center
-
-        local SubAPI = {}
-        function SubAPI:Toggle()
-            SubMain.Visible = not SubMain.Visible
-        end
-        function SubAPI:Open()
-            SubMain.Visible = true
-        end
-        function SubAPI:Close()
-            SubMain.Visible = false
-        end
 
         return SubAPI
     end
