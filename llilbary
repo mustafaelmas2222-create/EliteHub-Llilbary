@@ -1,43 +1,42 @@
 -- ========================================================
--- ELITE HUB - Smart Script Analyzer & AI Assistant Edition
+-- SYNAPSE HUB - SubWindow Supported UI Library
 -- ========================================================
 
-local EliteHub = {}
-EliteHub.__index = EliteHub
+local SynapseHub = {}
+SynapseHub.__index = SynapseHub
 
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 local CoreGui = game:GetService("CoreGui")
-local HttpService = game:GetService("HttpService")
 
 local LocalPlayer = Players.LocalPlayer
 
-function EliteHub:CreateWindow(Settings)
+function SynapseHub:CreateWindow(Settings)
     Settings = Settings or {}
-    WindowName = Settings.Name or "ELITE HUB"
+    local WindowName = Settings.Name or "SYNAPSE HUB"
     
     -- Eski GUI Temizliği
-    if CoreGui:FindFirstChild("EliteHubLibrary") then
-        CoreGui.EliteHubLibrary:Destroy()
+    if CoreGui:FindFirstChild("SynapseHubLibrary") then
+        CoreGui.SynapseHubLibrary:Destroy()
     end
 
     -- ScreenGui
     local ScreenGui = Instance.new("ScreenGui")
-    ScreenGui.Name = "EliteHubLibrary"
+    ScreenGui.Name = "SynapseHubLibrary"
     ScreenGui.Parent = CoreGui
     ScreenGui.ResetOnSpawn = false
 
-    -- Ana Gövde Panel (480x300)
+    -- Ana Gövde Panel (480x320)
     local Main = Instance.new("Frame")
     Main.Name = "Main"
     Main.Parent = ScreenGui
     Main.AnchorPoint = Vector2.new(0.5, 0.5)
     Main.Position = UDim2.new(0.5, 0, 0.5, 0)
-    Main.Size = UDim2.new(0, 480, 0, 300)
-    Main.BackgroundColor3 = Color3.fromRGB(12, 9, 18)
-    Main.BackgroundTransparency = 0.25
+    Main.Size = UDim2.new(0, 480, 0, 320)
+    Main.BackgroundColor3 = Color3.fromRGB(8, 6, 12)
+    Main.BackgroundTransparency = 0.15
     Main.ClipsDescendants = false
 
     local MainCorner = Instance.new("UICorner")
@@ -63,7 +62,7 @@ function EliteHub:CreateWindow(Settings)
     Shadow.BackgroundTransparency = 1
     Shadow.Image = "rbxassetid://6014261993"
     Shadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
-    Shadow.ImageTransparency = 0.4
+    Shadow.ImageTransparency = 0.5
     Shadow.ZIndex = 0
 
     -- UI Stroke (Çerçeve Parlaması)
@@ -74,9 +73,9 @@ function EliteHub:CreateWindow(Settings)
 
     local StrokeGradient = Instance.new("UIGradient")
     StrokeGradient.Color = ColorSequence.new({
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(160, 85, 235)),
-        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(35, 18, 55)),
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(120, 50, 190))
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(120, 50, 190)),
+        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(20, 10, 30)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(90, 30, 150))
     })
     StrokeGradient.Rotation = 45
     StrokeGradient.Parent = MainStroke
@@ -87,7 +86,7 @@ function EliteHub:CreateWindow(Settings)
     Content.Parent = Main
     Content.Size = UDim2.new(1, 0, 1, 0)
     Content.BackgroundTransparency = 1
-    Content.ClipsDescendants = false
+    Content.ClipsDescendants = true
     Content.ZIndex = 2
 
     local ContentCorner = Instance.new("UICorner")
@@ -98,25 +97,25 @@ function EliteHub:CreateWindow(Settings)
     local Header = Instance.new("Frame")
     Header.Name = "Header"
     Header.Parent = Content
-    Header.Size = UDim2.new(1, 0, 0, 54)
+    Header.Size = UDim2.new(1, 0, 0, 50)
     Header.BackgroundTransparency = 1
 
     local Title = Instance.new("TextLabel")
     Title.Name = "Title"
     Title.Parent = Header
     Title.Position = UDim2.new(0, 22, 0.5, -13)
-    Title.Size = UDim2.new(0, 180, 0, 26)
+    Title.Size = UDim2.new(0, 250, 0, 26)
     Title.BackgroundTransparency = 1
     Title.Font = Enum.Font.GothamBlack
     Title.Text = string.upper(WindowName)
-    Title.TextColor3 = Color3.fromRGB(245, 240, 255)
-    Title.TextSize = 19
+    Title.TextColor3 = Color3.fromRGB(235, 225, 250)
+    Title.TextSize = 18
     Title.TextXAlignment = Enum.TextXAlignment.Left
 
     local TitleGradient = Instance.new("UIGradient")
     TitleGradient.Color = ColorSequence.new({
         ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(175, 130, 235))
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(150, 100, 210))
     })
     TitleGradient.Parent = Title
 
@@ -129,7 +128,7 @@ function EliteHub:CreateWindow(Settings)
     CloseBtn.BackgroundTransparency = 1
     CloseBtn.Font = Enum.Font.ArialBold
     CloseBtn.Text = "X"
-    CloseBtn.TextColor3 = Color3.fromRGB(190, 170, 220)
+    CloseBtn.TextColor3 = Color3.fromRGB(170, 150, 200)
     CloseBtn.TextSize = 15
     CloseBtn.AutoButtonColor = false
 
@@ -137,7 +136,7 @@ function EliteHub:CreateWindow(Settings)
         TweenService:Create(CloseBtn, TweenInfo.new(0.2), {TextColor3 = Color3.fromRGB(255, 70, 90)}):Play()
     end)
     CloseBtn.MouseLeave:Connect(function()
-        TweenService:Create(CloseBtn, TweenInfo.new(0.2), {TextColor3 = Color3.fromRGB(190, 170, 220)}):Play()
+        TweenService:Create(CloseBtn, TweenInfo.new(0.2), {TextColor3 = Color3.fromRGB(170, 150, 200)}):Play()
     end)
     CloseBtn.MouseButton1Click:Connect(function()
         local closeTween = TweenService:Create(Main, TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.In), {Size = UDim2.new(0, 0, 0, 0)})
@@ -147,54 +146,7 @@ function EliteHub:CreateWindow(Settings)
         ScreenGui:Destroy()
     end)
 
-    -- Sağ Üst AI Tuşu
-    local AIToggleBtn = Instance.new("TextButton")
-    AIToggleBtn.Name = "AIToggleBtn"
-    AIToggleBtn.Parent = Header
-    AIToggleBtn.Position = UDim2.new(1, -78, 0.5, -13)
-    AIToggleBtn.Size = UDim2.new(0, 30, 0, 26)
-    AIToggleBtn.BackgroundColor3 = Color3.fromRGB(22, 15, 32)
-    AIToggleBtn.BackgroundTransparency = 0.3
-    AIToggleBtn.Font = Enum.Font.GothamBold
-    AIToggleBtn.Text = "✨"
-    AIToggleBtn.TextColor3 = Color3.fromRGB(210, 185, 255)
-    AIToggleBtn.TextSize = 13
-    AIToggleBtn.AutoButtonColor = false
-
-    local AIBtnCorner = Instance.new("UICorner")
-    AIBtnCorner.CornerRadius = UDim.new(0, 8)
-    AIBtnCorner.Parent = AIToggleBtn
-
-    local AIBtnStroke = Instance.new("UIStroke")
-    AIBtnStroke.Parent = AIToggleBtn
-    AIBtnStroke.Color = Color3.fromRGB(65, 38, 98)
-    AIBtnStroke.Thickness = 1.2
-    AIBtnStroke.Transparency = 0.5
-
-    AIToggleBtn.MouseEnter:Connect(function()
-        TweenService:Create(AIToggleBtn, TweenInfo.new(0.15), {
-            BackgroundColor3 = Color3.fromRGB(48, 26, 75),
-            BackgroundTransparency = 0.1,
-            TextColor3 = Color3.fromRGB(255, 255, 255)
-        }):Play()
-        TweenService:Create(AIBtnStroke, TweenInfo.new(0.15), {
-            Color = Color3.fromRGB(160, 85, 235),
-            Transparency = 0
-        }):Play()
-    end)
-    AIToggleBtn.MouseLeave:Connect(function()
-        TweenService:Create(AIToggleBtn, TweenInfo.new(0.15), {
-            BackgroundColor3 = Color3.fromRGB(22, 15, 32),
-            BackgroundTransparency = 0.3,
-            TextColor3 = Color3.fromRGB(210, 185, 255)
-        }):Play()
-        TweenService:Create(AIBtnStroke, TweenInfo.new(0.15), {
-            Color = Color3.fromRGB(65, 38, 98),
-            Transparency = 0.5
-        }):Play()
-    end)
-
-    -- Sürükleme ve Ekran Sınırı Koruması
+    -- Sürükleme Mantığı
     local dragging = false
     local dragInput = nil
     local dragStart = nil
@@ -235,7 +187,6 @@ function EliteHub:CreateWindow(Settings)
     RunService.RenderStepped:Connect(function()
         local viewportSize = workspace.CurrentCamera.ViewportSize
         local currentPos = Main.Position
-        
         local halfW = Main.AbsoluteSize.X / 2
         local halfH = Main.AbsoluteSize.Y / 2
         
@@ -249,264 +200,41 @@ function EliteHub:CreateWindow(Settings)
         end
     end)
 
-    -- Normal İçerik Kapsayıcısı
+    -- Ana İçerik Kapsayıcısı
     local Container = Instance.new("ScrollingFrame")
     Container.Name = "Container"
     Container.Parent = Content
     Container.BackgroundTransparency = 1
-    Container.Position = UDim2.new(0, 22, 0, 56)
-    Container.Size = UDim2.new(1, -44, 0, 185)
-    Container.ScrollBarThickness = 2
-    Container.ScrollBarImageColor3 = Color3.fromRGB(150, 90, 220)
+    Container.Position = UDim2.new(0, 16, 0, 52)
+    Container.Size = UDim2.new(1, -32, 0, 210)
+    Container.ScrollBarThickness = 3
+    Container.ScrollBarImageColor3 = Color3.fromRGB(120, 60, 180)
     Container.BorderSizePixel = 0
+    Container.CanvasSize = UDim2.new(0, 0, 0, 0)
 
-    local UIGrid = Instance.new("UIGridLayout")
-    UIGrid.Parent = Container
-    UIGrid.CellSize = UDim2.new(0.48, 0, 0, 68)
-    UIGrid.CellPadding = UDim2.new(0.04, 0, 0, 12)
-    UIGrid.HorizontalAlignment = Enum.HorizontalAlignment.Center
+    local UIList = Instance.new("UIListLayout")
+    UIList.Parent = Container
+    UIList.SortOrder = Enum.SortOrder.LayoutOrder
+    UIList.Padding = UDim.new(0, 8)
+    UIList.HorizontalAlignment = Enum.HorizontalAlignment.Center
 
-    UIGrid:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-        Container.CanvasSize = UDim2.new(0, 0, 0, UIGrid.AbsoluteContentSize.Y + 10)
+    UIList:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+        Container.CanvasSize = UDim2.new(0, 0, 0, UIList.AbsoluteContentSize.Y + 10)
     end)
-
-    -- --- AKILLI YAN AI PANELİ ---
-    local AIChatFrame = Instance.new("Frame")
-    AIChatFrame.Name = "AIChatSidePanel"
-    AIChatFrame.Parent = ScreenGui
-    AIChatFrame.AnchorPoint = Vector2.new(0, 0.5)
-    AIChatFrame.Size = UDim2.new(0, 300, 0, 300)
-    AIChatFrame.BackgroundColor3 = Color3.fromRGB(12, 9, 18)
-    AIChatFrame.BackgroundTransparency = 0.25
-    AIChatFrame.Visible = false
-    AIChatFrame.ZIndex = 5
-
-    local AIChatCorner = Instance.new("UICorner")
-    AIChatCorner.CornerRadius = UDim.new(0, 20)
-    AIChatCorner.Parent = AIChatFrame
-
-    local AIChatStroke = Instance.new("UIStroke")
-    AIChatStroke.Parent = AIChatFrame
-    AIChatStroke.Color = Color3.fromRGB(160, 85, 235)
-    AIChatStroke.Thickness = 1.4
-    AIChatStroke.Transparency = 0.3
-
-    -- Yan Panel Başlığı
-    local AIHeader = Instance.new("TextLabel")
-    AIHeader.Parent = AIChatFrame
-    AIHeader.Position = UDim2.new(0, 16, 0, 14)
-    AIHeader.Size = UDim2.new(1, -32, 0, 24)
-    AIHeader.BackgroundTransparency = 1
-    AIHeader.Font = Enum.Font.GothamBlack
-    AIHeader.Text = "ELITE AI ASSISTANT"
-    AIHeader.TextColor3 = Color3.fromRGB(245, 240, 255)
-    AIHeader.TextSize = 15
-    AIHeader.TextXAlignment = Enum.TextXAlignment.Left
-
-    -- Sohbet Geçmişi Alanı
-    local ChatScroll = Instance.new("ScrollingFrame")
-    ChatScroll.Name = "ChatScroll"
-    ChatScroll.Parent = AIChatFrame
-    ChatScroll.Position = UDim2.new(0, 12, 0, 48)
-    ChatScroll.Size = UDim2.new(1, -24, 1, -100)
-    ChatScroll.BackgroundTransparency = 1
-    ChatScroll.ScrollBarThickness = 2
-    ChatScroll.ScrollBarImageColor3 = Color3.fromRGB(160, 85, 235)
-    ChatScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
-    ChatScroll.BorderSizePixel = 0
-
-    local ChatList = Instance.new("UIListLayout")
-    ChatList.Parent = ChatScroll
-    ChatList.SortOrder = Enum.SortOrder.LayoutOrder
-    ChatList.Padding = UDim.new(0, 6)
-
-    ChatList:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-        ChatScroll.CanvasSize = UDim2.new(0, 0, 0, ChatList.AbsoluteContentSize.Y + 10)
-        ChatScroll.CanvasPosition = Vector2.new(0, ChatList.AbsoluteContentSize.Y)
-    end)
-
-    local function AddMessage(sender, text, isUser)
-        local msgContainer = Instance.new("Frame")
-        msgContainer.Parent = ChatScroll
-        msgContainer.Size = UDim2.new(1, 0, 0, 0)
-        msgContainer.AutomaticSize = Enum.AutomaticSize.Y
-        msgContainer.BackgroundTransparency = 1
-
-        local bubble = Instance.new("TextLabel")
-        bubble.Parent = msgContainer
-        bubble.Size = UDim2.new(1, 0, 0, 0)
-        bubble.AutomaticSize = Enum.AutomaticSize.Y
-        bubble.BackgroundColor3 = isUser and Color3.fromRGB(48, 26, 75) or Color3.fromRGB(18, 12, 28)
-        bubble.BackgroundTransparency = 0.2
-        bubble.Font = Enum.Font.Gotham
-        bubble.Text = "<b>" .. sender .. ":</b>\n" .. text
-        bubble.TextColor3 = Color3.fromRGB(235, 225, 255)
-        bubble.TextSize = 11
-        bubble.TextWrapped = true
-        bubble.RichText = true
-        bubble.TextXAlignment = Enum.TextXAlignment.Left
-
-        local bubbleCorner = Instance.new("UICorner")
-        bubbleCorner.CornerRadius = UDim.new(0, 6)
-        bubbleCorner.Parent = bubble
-
-        local padding = Instance.new("UIPadding")
-        padding.Parent = bubble
-        padding.PaddingTop = UDim.new(0, 6)
-        padding.PaddingBottom = UDim.new(0, 6)
-        padding.PaddingLeft = UDim.new(0, 8)
-        padding.PaddingRight = UDim.new(0, 8)
-    end
-
-    AddMessage("Elite AI", "Selam! Ben Elite AI. Script analizi yapabilir ve Synapse/Elite Hub hakkında sorularını yanıtlayabilirim.", false)
-
-    -- Yan Panel Alt Mesaj Giriş Alanı
-    local AIInputBox = Instance.new("TextBox")
-    AIInputBox.Name = "AIInputBox"
-    AIInputBox.Parent = AIChatFrame
-    AIInputBox.Position = UDim2.new(0, 12, 1, -44)
-    AIInputBox.Size = UDim2.new(0.72, 0, 0, 32)
-    AIInputBox.BackgroundColor3 = Color3.fromRGB(12, 8, 18)
-    AIInputBox.BackgroundTransparency = 0.5
-    AIInputBox.Font = Enum.Font.GothamMedium
-    AIInputBox.PlaceholderText = "Script text veya soru yaz..."
-    AIInputBox.Text = ""
-    AIInputBox.TextColor3 = Color3.fromRGB(255, 255, 255)
-    AIInputBox.TextSize = 11
-    AIInputBox.ClearTextOnFocus = false
-
-    local AIInputCorner = Instance.new("UICorner")
-    AIInputCorner.CornerRadius = UDim.new(0, 6)
-    AIInputCorner.Parent = AIInputBox
-
-    local AISendBtn = Instance.new("TextButton")
-    AISendBtn.Name = "AISendBtn"
-    AISendBtn.Parent = AIChatFrame
-    AISendBtn.Position = UDim2.new(0.74, 0, 1, -44)
-    AISendBtn.Size = UDim2.new(0.26, -12, 0, 32)
-    AISendBtn.BackgroundColor3 = Color3.fromRGB(160, 85, 235)
-    AISendBtn.BackgroundTransparency = 0.2
-    AISendBtn.Font = Enum.Font.GothamBold
-    AISendBtn.Text = "Gönder"
-    AISendBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-    AISendBtn.TextSize = 11
-    AISendBtn.AutoButtonColor = false
-
-    local AISendCorner = Instance.new("UICorner")
-    AISendCorner.CornerRadius = UDim.new(0, 6)
-    AISendCorner.Parent = AISendBtn
-
-    -- Yan Paneli Açıp Kapatma Mantığı
-    local aiOpen = false
-    AIToggleBtn.MouseButton1Click:Connect(function()
-        aiOpen = not aiOpen
-        AIChatFrame.Visible = aiOpen
-    end)
-
-    -- Sınır Koruması
-    RunService.RenderStepped:Connect(function()
-        if not AIChatFrame.Visible then return end
-
-        local viewportSize = workspace.CurrentCamera.ViewportSize
-        local mainAbsPos = Main.AbsolutePosition
-        local mainAbsSize = Main.AbsoluteSize
-        local panelWidth = 300
-        local spacing = 10
-
-        local targetX = mainAbsPos.X + mainAbsSize.X + spacing
-
-        if (targetX + panelWidth) > viewportSize.X then
-            targetX = mainAbsPos.X - panelWidth - spacing
-        end
-
-        targetX = math.clamp(targetX, 10, viewportSize.X - panelWidth - 10)
-        local targetY = math.clamp(mainAbsPos.Y + (mainAbsSize.Y / 2), 150, viewportSize.Y - 150)
-
-        AIChatFrame.Position = UDim2.new(0, targetX, 0, targetY)
-    end)
-
-    -- Yapay Zekaya İstek Gönderme (Script Analiz Fonksiyonu)
-    AISendBtn.MouseButton1Click:Connect(function()
-        local userMessage = AIInputBox.Text
-        if userMessage == "" then return end
-
-        AddMessage("Sen", userMessage, true)
-        AIInputBox.Text = ""
-        AISendBtn.Active = false
-
-        task.spawn(function()
-            local endpoint = "https://8328-ir9sdpad3s1gvk1yalxnx-2d7fefa8.us3.manus.computer/api/generate"
-            
-            local smartPrompt = [[
-Sen Elite Hub ve Synapse Hub ekosisteminin resmi yapay zeka asistanısın. 
-Kuralların:
-1. Kullanıcı sana bir script, özellik açıklaması veya "script text" (örn: "fly noclip so good bypass") gönderdiğinde veya sorduğunda, ÖNCE bu scriptin ne işe yaradığını, nasıl çalıştığını, kullanıcısına ne sağladığını detaylı ve samimi bir dille açıkla.
-2. Synapse Hub veya Elite Hub hakkında sorular sorulduğunda detaylıca bilgi ver.
-3. Eğer kod üretmen gerekiyorsa, sözdizimi hatalarından arındırılmış kusursuz Luau kodu yaz ve bu kodu kesinlikle başı '[( ' ve sonu ' )]' olacak şekilde bu işaretlerin arasına koy. Açıklamalarda bu işaretleri asla kullanma.
-
-Kullanıcı Girdisi: ]] .. userMessage
-
-            local requestBody = {
-                language = "luau",
-                prompt = smartPrompt
-            }
-
-            local success, response = pcall(function()
-                return HttpService:RequestAsync({
-                    Url = endpoint,
-                    Method = "POST",
-                    Headers = { ["Content-Type"] = "application/json" },
-                    Body = HttpService:JSONEncode(requestBody),
-                })
-            end)
-
-            if success and response and response.Success then
-                local decodedSuccess, decodedBody = pcall(function()
-                    return HttpService:JSONDecode(response.Body)
-                end)
-                
-                if decodedSuccess and decodedBody and decodedBody.output then
-                    local aiReply = tostring(decodedBody.output)
-                    AddMessage("Elite AI", aiReply, false)
-
-                    local extractedCode = aiReply:match("%[%((.-)%)]")
-                    if extractedCode then
-                        local func, err = loadstring(extractedCode)
-                        if func then
-                            local runSuccess, runErr = pcall(func)
-                            if runSuccess then
-                                AddMessage("Sistem", "✔ Script analiz edildi ve çalıştırıldı!", false)
-                            else
-                                AddMessage("Sistem", "❌ Çalıştırma Hatası: " .. tostring(runErr), false)
-                            end
-                        else
-                            AddMessage("Sistem", "❌ Sözdizimi Hatası: " .. tostring(err), false)
-                        end
-                    end
-                else
-                    AddMessage("Elite AI", "Hata: Yanıt şemasında 'output' bulunamadı.", false)
-                end
-            else
-                AddMessage("Elite AI", "Bağlantı hatası oluştu!", false)
-            end
-            AISendBtn.Active = true
-        end)
-    end)
-    --------------------------------------------------------
 
     -- Profil Alt Şeridi
     local UserFooter = Instance.new("Frame")
     UserFooter.Name = "UserFooter"
     UserFooter.Parent = Content
-    UserFooter.Position = UDim2.new(0, 22, 1, -40)
-    UserFooter.Size = UDim2.new(1, -44, 0, 32)
+    UserFooter.Position = UDim2.new(0, 22, 1, -38)
+    UserFooter.Size = UDim2.new(1, -44, 0, 30)
     UserFooter.BackgroundTransparency = 1
 
     local UserAvatar = Instance.new("ImageLabel")
     UserAvatar.Name = "UserAvatar"
     UserAvatar.Parent = UserFooter
-    UserAvatar.Position = UDim2.new(0, 0, 0.5, -13)
-    UserAvatar.Size = UDim2.new(0, 26, 0, 26)
+    UserAvatar.Position = UDim2.new(0, 0, 0.5, -12)
+    UserAvatar.Size = UDim2.new(0, 24, 0, 24)
     UserAvatar.BackgroundTransparency = 1
     UserAvatar.Image = "rbxthumb://type=AvatarHeadShot&id=" .. LocalPlayer.UserId .. "&w=150&h=150"
 
@@ -517,106 +245,389 @@ Kullanıcı Girdisi: ]] .. userMessage
     local UserName = Instance.new("TextLabel")
     UserName.Name = "UserName"
     UserName.Parent = UserFooter
-    UserName.Position = UDim2.new(0, 34, 0, 0)
+    UserName.Position = UDim2.new(0, 32, 0, 0)
     UserName.Size = UDim2.new(0, 220, 1, 0)
     UserName.BackgroundTransparency = 1
     UserName.Font = Enum.Font.GothamMedium
     UserName.Text = LocalPlayer.Name
-    UserName.TextColor3 = Color3.fromRGB(210, 195, 235)
-    UserName.TextSize = 13
+    UserName.TextColor3 = Color3.fromRGB(190, 175, 215)
+    UserName.TextSize = 12
     UserName.TextXAlignment = Enum.TextXAlignment.Left
 
     local StatusText = Instance.new("TextLabel")
     StatusText.Name = "StatusText"
     StatusText.Parent = UserFooter
-    StatusText.Position = UDim2.new(1, -100, 0, 0)
-    StatusText.Size = UDim2.new(0, 100, 1, 0)
+    StatusText.Position = UDim2.new(1, -90, 0, 0)
+    StatusText.Size = UDim2.new(0, 90, 1, 0)
     StatusText.BackgroundTransparency = 1
     StatusText.Font = Enum.Font.GothamBold
     StatusText.Text = "● ONLINE"
-    StatusText.TextColor3 = Color3.fromRGB(100, 210, 150)
-    StatusText.TextSize = 11
+    StatusText.TextColor3 = Color3.fromRGB(80, 190, 130)
+    StatusText.TextSize = 10
     StatusText.TextXAlignment = Enum.TextXAlignment.Right
 
     -- Açılış Animasyonu
     Main.Size = UDim2.new(0, 0, 0, 0)
     Shadow.ImageTransparency = 1
 
-    TweenService:Create(Main, TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
-        Size = UDim2.new(0, 480, 0, 300)
+    TweenService:Create(Main, TweenInfo.new(0.35, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
+        Size = UDim2.new(0, 480, 0, 320)
     }):Play()
 
-    TweenService:Create(Shadow, TweenInfo.new(0.4), {
-        ImageTransparency = 0.4
+    TweenService:Create(Shadow, TweenInfo.new(0.35), {
+        ImageTransparency = 0.5
     }):Play()
 
-    -- Tab Yapısı Nesnesi
+    -- Bileşenler Objesi
     local WindowElements = {}
 
-    function WindowElements:CreateButton(ButtonSettings)
-        ButtonSettings = ButtonSettings or {}
-        local BtnName = ButtonSettings.Name or "Button"
-        local Callback = ButtonSettings.Callback or function() end
-
+    -- Standart Elemanlar (Button, Toggle, Slider, TextBox, Label)
+    function WindowElements:CreateButton(Settings)
+        Settings = Settings or {}
         local btn = Instance.new("TextButton")
-        btn.Name = BtnName
         btn.Parent = Container
-        btn.BackgroundColor3 = Color3.fromRGB(22, 15, 32)
-        btn.BackgroundTransparency = 0.3
+        btn.Size = UDim2.new(1, 0, 0, 40)
+        btn.BackgroundColor3 = Color3.fromRGB(14, 10, 22)
+        btn.BackgroundTransparency = 0.2
         btn.AutoButtonColor = false
         btn.Font = Enum.Font.GothamMedium
-        btn.Text = BtnName
-        btn.TextColor3 = Color3.fromRGB(220, 210, 235)
-        btn.TextSize = 14
+        btn.Text = Settings.Name or ""
+        btn.TextColor3 = Color3.fromRGB(200, 190, 220)
+        btn.TextSize = 13
 
-        local btnCorner = Instance.new("UICorner")
-        btnCorner.CornerRadius = UDim.new(0, 14)
-        btnCorner.Parent = btn
+        local corner = Instance.new("UICorner")
+        corner.CornerRadius = UDim.new(0, 10)
+        corner.Parent = btn
 
-        local btnStroke = Instance.new("UIStroke")
-        btnStroke.Parent = btn
-        btnStroke.Color = Color3.fromRGB(65, 38, 98)
-        btnStroke.Thickness = 1.2
-        btnStroke.Transparency = 0.5
+        local stroke = Instance.new("UIStroke")
+        stroke.Parent = btn
+        stroke.Color = Color3.fromRGB(45, 25, 70)
+        stroke.Thickness = 1.2
+        stroke.Transparency = 0.4
 
-        -- Hover & Click Animasyonu
-        btn.MouseEnter:Connect(function()
-            TweenService:Create(btn, TweenInfo.new(0.15), {
-                BackgroundColor3 = Color3.fromRGB(48, 26, 75),
-                BackgroundTransparency = 0.1,
-                TextColor3 = Color3.fromRGB(255, 255, 255)
-            }):Play()
-            TweenService:Create(btnStroke, TweenInfo.new(0.15), {
-                Color = Color3.fromRGB(160, 85, 235),
-                Transparency = 0
-            }):Play()
+        btn.MouseButton1Click:Connect(function()
+            pcall(Settings.Callback or function() end)
         end)
-
-        btn.MouseLeave:Connect(function()
-            TweenService:Create(btn, TweenInfo.new(0.15), {
-                BackgroundColor3 = Color3.fromRGB(22, 15, 32),
-                BackgroundTransparency = 0.3,
-                TextColor3 = Color3.fromRGB(220, 210, 235)
-            }):Play()
-            TweenService:Create(btnStroke, TweenInfo.new(0.15), {
-                Color = Color3.fromRGB(65, 38, 98),
-                Transparency = 0.5
-            }):Play()
-        end)
-
-        btn.MouseButton1Down:Connect(function()
-            TweenService:Create(btn, TweenInfo.new(0.06), {Size = UDim2.new(0.45, 0, 0, 63)}):Play()
-        end)
-
-        btn.MouseButton1Up:Connect(function()
-            TweenService:Create(btn, TweenInfo.new(0.1), {Size = UDim2.new(0.48, 0, 0, 68)}):Play()
-            pcall(Callback)
-        end)
-
         return btn
+    end
+
+    function WindowElements:CreateToggle(Settings)
+        Settings = Settings or {}
+        local toggled = Settings.Default or false
+        local frame = Instance.new("TextButton")
+        frame.Parent = Container
+        frame.Size = UDim2.new(1, 0, 0, 40)
+        frame.BackgroundColor3 = Color3.fromRGB(14, 10, 22)
+        frame.BackgroundTransparency = 0.2
+        frame.AutoButtonColor = false
+        frame.Text = ""
+
+        local corner = Instance.new("UICorner")
+        corner.CornerRadius = UDim.new(0, 10)
+        corner.Parent = frame
+
+        local stroke = Instance.new("UIStroke")
+        stroke.Parent = frame
+        stroke.Color = Color3.fromRGB(45, 25, 70)
+        stroke.Thickness = 1.2
+        stroke.Transparency = 0.4
+
+        local label = Instance.new("TextLabel")
+        label.Parent = frame
+        label.Position = UDim2.new(0, 14, 0, 0)
+        label.Size = UDim2.new(0.7, 0, 1, 0)
+        label.BackgroundTransparency = 1
+        label.Font = Enum.Font.GothamMedium
+        label.Text = Settings.Name or ""
+        label.TextColor3 = Color3.fromRGB(200, 190, 220)
+        label.TextSize = 13
+        label.TextXAlignment = Enum.TextXAlignment.Left
+
+        local switch = Instance.new("Frame")
+        switch.Parent = frame
+        switch.AnchorPoint = Vector2.new(1, 0.5)
+        switch.Position = UDim2.new(1, -14, 0.5, 0)
+        switch.Size = UDim2.new(0, 40, 0, 20)
+        switch.BackgroundColor3 = toggled and Color3.fromRGB(130, 60, 200) or Color3.fromRGB(25, 18, 38)
+
+        local switchCorner = Instance.new("UICorner")
+        switchCorner.CornerRadius = UDim.new(1, 0)
+        switchCorner.Parent = switch
+
+        local circle = Instance.new("Frame")
+        circle.Parent = switch
+        circle.AnchorPoint = Vector2.new(0, 0.5)
+        circle.Position = toggled and UDim2.new(1, -18, 0.5, 0) or UDim2.new(0, 2, 0.5, 0)
+        circle.Size = UDim2.new(0, 16, 0, 16)
+        circle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+
+        local circleCorner = Instance.new("UICorner")
+        circleCorner.CornerRadius = UDim.new(1, 0)
+        circleCorner.Parent = circle
+
+        frame.MouseButton1Click:Connect(function()
+            toggled = not toggled
+            TweenService:Create(switch, TweenInfo.new(0.2), {BackgroundColor3 = toggled and Color3.fromRGB(130, 60, 200) or Color3.fromRGB(25, 18, 38)}):Play()
+            TweenService:Create(circle, TweenInfo.new(0.2), {Position = toggled and UDim2.new(1, -18, 0.5, 0) or UDim2.new(0, 2, 0.5, 0)}):Play()
+            pcall(Settings.Callback or function() end, toggled)
+        end)
+        return frame
+    end
+
+    function WindowElements:CreateSlider(Settings)
+        Settings = Settings or {}
+        local Min = Settings.Min or 0
+        local Max = Settings.Max or 100
+        local Default = Settings.Default or 50
+
+        local frame = Instance.new("Frame")
+        frame.Parent = Container
+        frame.Size = UDim2.new(1, 0, 0, 52)
+        frame.BackgroundColor3 = Color3.fromRGB(14, 10, 22)
+        frame.BackgroundTransparency = 0.2
+
+        local corner = Instance.new("UICorner")
+        corner.CornerRadius = UDim.new(0, 10)
+        corner.Parent = frame
+
+        local stroke = Instance.new("UIStroke")
+        stroke.Parent = frame
+        stroke.Color = Color3.fromRGB(45, 25, 70)
+        stroke.Thickness = 1.2
+        stroke.Transparency = 0.4
+
+        local label = Instance.new("TextLabel")
+        label.Parent = frame
+        label.Position = UDim2.new(0, 14, 0, 6)
+        label.Size = UDim2.new(0.7, 0, 0, 18)
+        label.BackgroundTransparency = 1
+        label.Font = Enum.Font.GothamMedium
+        label.Text = Settings.Name or ""
+        label.TextColor3 = Color3.fromRGB(200, 190, 220)
+        label.TextSize = 13
+        label.TextXAlignment = Enum.TextXAlignment.Left
+
+        local valueLabel = Instance.new("TextLabel")
+        valueLabel.Parent = frame
+        valueLabel.Position = UDim2.new(0.7, 0, 0, 6)
+        valueLabel.Size = UDim2.new(0.3, -14, 0, 18)
+        valueLabel.BackgroundTransparency = 1
+        valueLabel.Font = Enum.Font.GothamBold
+        valueLabel.Text = tostring(Default)
+        valueLabel.TextColor3 = Color3.fromRGB(170, 100, 240)
+        valueLabel.TextSize = 13
+        valueLabel.TextXAlignment = Enum.TextXAlignment.Right
+
+        local sliderBar = Instance.new("TextButton")
+        sliderBar.Parent = frame
+        sliderBar.Position = UDim2.new(0, 14, 0, 32)
+        sliderBar.Size = UDim2.new(1, -28, 0, 6)
+        sliderBar.BackgroundColor3 = Color3.fromRGB(25, 18, 38)
+        sliderBar.AutoButtonColor = false
+        sliderBar.Text = ""
+
+        local barCorner = Instance.new("UICorner")
+        barCorner.CornerRadius = UDim.new(1, 0)
+        barCorner.Parent = sliderBar
+
+        local sliderFill = Instance.new("Frame")
+        sliderFill.Parent = sliderBar
+        sliderFill.Size = UDim2.new((Default - Min) / (Max - Min), 0, 1, 0)
+        sliderFill.BackgroundColor3 = Color3.fromRGB(130, 60, 200)
+
+        local fillCorner = Instance.new("UICorner")
+        fillCorner.CornerRadius = UDim.new(1, 0)
+        fillCorner.Parent = sliderFill
+
+        local draggingSlider = false
+        sliderBar.InputBegan:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+                draggingSlider = true
+            end
+        end)
+        UserInputService.InputEnded:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+                draggingSlider = false
+            end
+        end)
+        UserInputService.InputChanged:Connect(function(input)
+            if draggingSlider and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+                local pos = math.clamp((input.Position.X - sliderBar.AbsolutePosition.X) / sliderBar.AbsoluteSize.X, 0, 1)
+                local val = math.floor(Min + ((Max - Min) * pos))
+                sliderFill.Size = UDim2.new(pos, 0, 1, 0)
+                valueLabel.Text = tostring(val)
+                pcall(Settings.Callback or function() end, val)
+            end
+        end)
+        return frame
+    end
+
+    function WindowElements:CreateTextBox(Settings)
+        Settings = Settings or {}
+        local frame = Instance.new("Frame")
+        frame.Parent = Container
+        frame.Size = UDim2.new(1, 0, 0, 52)
+        frame.BackgroundColor3 = Color3.fromRGB(14, 10, 22)
+        frame.BackgroundTransparency = 0.2
+
+        local corner = Instance.new("UICorner")
+        corner.CornerRadius = UDim.new(0, 10)
+        corner.Parent = frame
+
+        local stroke = Instance.new("UIStroke")
+        stroke.Parent = frame
+        stroke.Color = Color3.fromRGB(45, 25, 70)
+        stroke.Thickness = 1.2
+        stroke.Transparency = 0.4
+
+        local label = Instance.new("TextLabel")
+        label.Parent = frame
+        label.Position = UDim2.new(0, 14, 0, 4)
+        label.Size = UDim2.new(1, -28, 0, 16)
+        label.BackgroundTransparency = 1
+        label.Font = Enum.Font.GothamMedium
+        label.Text = Settings.Name or ""
+        label.TextColor3 = Color3.fromRGB(200, 190, 220)
+        label.TextSize = 12
+        label.TextXAlignment = Enum.TextXAlignment.Left
+
+        local textBox = Instance.new("TextBox")
+        textBox.Parent = frame
+        textBox.Position = UDim2.new(0, 14, 0, 22)
+        textBox.Size = UDim2.new(1, -28, 0, 24)
+        textBox.BackgroundColor3 = Color3.fromRGB(22, 15, 35)
+        textBox.BackgroundTransparency = 0.3
+        textBox.Font = Enum.Font.Gotham
+        textBox.PlaceholderText = Settings.Placeholder or ""
+        textBox.PlaceholderColor3 = Color3.fromRGB(120, 110, 140)
+        textBox.Text = ""
+        textBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+        textBox.TextSize = 12
+        textBox.ClearTextOnFocus = false
+
+        local boxCorner = Instance.new("UICorner")
+        boxCorner.CornerRadius = UDim.new(0, 6)
+        boxCorner.Parent = textBox
+
+        textBox.FocusLost:Connect(function()
+            pcall(Settings.Callback or function() end, textBox.Text)
+        end)
+        return frame
+    end
+
+    function WindowElements:CreateLabel(TextContent)
+        local labelFrame = Instance.new("Frame")
+        labelFrame.Parent = Container
+        labelFrame.Size = UDim2.new(1, 0, 0, 28)
+        labelFrame.BackgroundTransparency = 1
+
+        local textLabel = Instance.new("TextLabel")
+        textLabel.Parent = labelFrame
+        textLabel.Size = UDim2.new(1, -14, 1, 0)
+        textLabel.Position = UDim2.new(0, 7, 0, 0)
+        textLabel.BackgroundTransparency = 1
+        textLabel.Font = Enum.Font.GothamBold
+        textLabel.Text = TextContent or ""
+        textLabel.TextColor3 = Color3.fromRGB(160, 130, 200)
+        textLabel.TextSize = 12
+        textLabel.TextXAlignment = Enum.TextXAlignment.Left
+        return labelFrame
+    end
+
+    -- --- YENİ ÖZELLİK: AYRI ALT MENÜ (SUB-WINDOW) ---
+    function WindowElements:CreateSubWindow(SubSettings)
+        SubSettings = SubSettings or {}
+        local SubName = SubSettings.Name or "SUB WINDOW"
+
+        -- Ayrı Alt Menü Çerçevesi
+        local SubMain = Instance.new("Frame")
+        SubMain.Name = "SubWindow"
+        SubMain.Parent = ScreenGui
+        SubMain.AnchorPoint = Vector2.new(0.5, 0.5)
+        SubMain.Position = UDim2.new(0.5, 120, 0.5, 0) -- Ana menünün biraz yanında başlar
+        SubMain.Size = UDim2.new(0, 360, 0, 260)
+        SubMain.BackgroundColor3 = Color3.fromRGB(8, 6, 12)
+        SubMain.BackgroundTransparency = 0.15
+        SubMain.Visible = false -- Başlangıçta gizli
+        SubMain.ZIndex = 10
+
+        local SubCorner = Instance.new("UICorner")
+        SubCorner.CornerRadius = UDim.new(0, 16)
+        SubCorner.Parent = SubMain
+
+        local SubStroke = Instance.new("UIStroke")
+        SubStroke.Parent = SubMain
+        SubStroke.Color = Color3.fromRGB(120, 50, 190)
+        SubStroke.Thickness = 1.4
+
+        -- Alt Menü Header
+        local SubHeader = Instance.new("Frame")
+        SubHeader.Name = "SubHeader"
+        SubHeader.Parent = SubMain
+        SubHeader.Size = UDim2.new(1, 0, 0, 44)
+        SubHeader.BackgroundTransparency = 1
+
+        local SubTitle = Instance.new("TextLabel")
+        SubTitle.Parent = SubHeader
+        SubTitle.Position = UDim2.new(0, 16, 0.5, -11)
+        SubTitle.Size = UDim2.new(0, 200, 0, 22)
+        SubTitle.BackgroundTransparency = 1
+        SubTitle.Font = Enum.Font.GothamBlack
+        SubTitle.Text = string.upper(SubName)
+        SubTitle.TextColor3 = Color3.fromRGB(235, 225, 250)
+        SubTitle.TextSize = 15
+        SubTitle.TextXAlignment = Enum.TextXAlignment.Left
+
+        local SubClose = Instance.new("TextButton")
+        SubClose.Parent = SubHeader
+        SubClose.Position = UDim2.new(1, -36, 0.5, -11)
+        SubClose.Size = UDim2.new(0, 22, 0, 22)
+        SubClose.BackgroundTransparency = 1
+        SubClose.Font = Enum.Font.ArialBold
+        SubClose.Text = "X"
+        SubClose.TextColor3 = Color3.fromRGB(170, 150, 200)
+        SubClose.TextSize = 13
+
+        SubClose.MouseButton1Click:Connect(function()
+            SubMain.Visible = false
+        end)
+
+        -- Alt Menü İçerik Listesi
+        local SubContainer = Instance.new("ScrollingFrame")
+        SubContainer.Parent = SubMain
+        SubContainer.BackgroundTransparency = 1
+        SubContainer.Position = UDim2.new(0, 12, 0, 46)
+        SubContainer.Size = UDim2.new(1, -24, 1, -56)
+        SubContainer.ScrollBarThickness = 2
+        SubContainer.ScrollBarImageColor3 = Color3.fromRGB(120, 60, 180)
+        SubContainer.BorderSizePixel = 0
+
+        local SubList = Instance.new("UIListLayout")
+        SubList.Parent = SubContainer
+        SubList.SortOrder = Enum.SortOrder.LayoutOrder
+        SubList.Padding = UDim.new(0, 6)
+        SubList.HorizontalAlignment = Enum.HorizontalAlignment.Center
+
+        SubList:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+            SubContainer.CanvasSize = UDim2.new(0, 0, 0, SubList.AbsoluteContentSize.Y + 10)
+        end)
+
+        -- Alt menüyü açıp kapamak için bir kontrol tablosu döndürüyoruz
+        local SubAPI = {}
+        function SubAPI:Toggle()
+            SubMain.Visible = not SubMain.Visible
+        end
+        function SubAPI:Open()
+            SubMain.Visible = true
+        end
+        function SubAPI:Close()
+            SubMain.Visible = false
+        end
+
+        return SubAPI
     end
 
     return WindowElements
 end
 
-return EliteHub
+return SynapseHub
