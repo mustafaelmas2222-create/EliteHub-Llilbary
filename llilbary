@@ -1,5 +1,5 @@
 -- ========================================================
--- SYNAPSE HUB - Final Animated UI Library
+-- SYNAPSE HUB - Snapping Slider & Lerp Drag UI Library
 -- ========================================================
 
 local SynapseHub = {}
@@ -135,25 +135,60 @@ function SynapseHub:CreateWindow(Settings)
         ScreenGui:Destroy()
     end)
 
-    local dragging, dragStart, startPos
+    -- SERT VE LERP'Lİ SÜRÜKLEME MİMARİSİ
+    local dragging = false
+    local dragInput = nil
+    local dragStart = nil
+    local startPos = nil
+    local targetPos = Main.Position
+
     Header.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
             dragging = true
+            dragInput = input
             dragStart = input.Position
             startPos = Main.Position
+            targetPos = Main.Position
             
             input.Changed:Connect(function()
                 if input.UserInputState == Enum.UserInputState.End then
                     dragging = false
+                    dragInput = nil
                 end
             end)
         end
     end)
 
     UserInputService.InputChanged:Connect(function(input)
-        if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+        if dragging and input == dragInput then
             local delta = input.Position - dragStart
-            Main.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+            targetPos = UDim2.new(
+                startPos.X.Scale, 
+                startPos.X.Offset + delta.X, 
+                startPos.Y.Scale, 
+                startPos.Y.Offset + delta.Y
+            )
+        end
+    end)
+
+    -- RenderStepped ile Sert ve Akıcı Lerp Takibi
+    RunService.RenderStepped:Connect(function()
+        local viewportSize = workspace.CurrentCamera.ViewportSize
+        local currentPos = Main.Position
+        local halfW = Main.AbsoluteSize.X / 2
+        local halfH = Main.AbsoluteSize.Y / 2
+        
+        local clampedX = math.clamp(targetPos.X.Offset, halfW, viewportSize.X - halfW)
+        local clampedY = math.clamp(targetPos.Y.Offset, halfH, viewportSize.Y - halfH)
+        
+        targetPos = UDim2.new(0, clampedX, 0, clampedY)
+
+        if dragging then
+            -- Sürüklerken sert ve anında tepki
+            Main.Position = Main.Position:Lerp(targetPos, 0.6)
+        else
+            -- Bırakıldığında yumuşak lerp sönümlemesi
+            Main.Position = Main.Position:Lerp(targetPos, 0.25)
         end
     end)
 
@@ -206,7 +241,7 @@ function SynapseHub:CreateWindow(Settings)
     UserName.TextSize = 12
     UserName.TextXAlignment = Enum.TextXAlignment.Left
 
-    local StatusText = Instance.textLabel and Instance.new("TextLabel") or Instance.new("TextLabel")
+    local StatusText = Instance.new("TextLabel")
     StatusText.Name = "StatusText"
     StatusText.Parent = UserFooter
     StatusText.Position = UDim2.new(1, -90, 0, 0)
@@ -231,7 +266,6 @@ function SynapseHub:CreateWindow(Settings)
 
     local WindowElements = {}
 
-    -- DÜZELTİLEN BUTTON (Basma Efekti ve Ölçeklendirme Eklendi)
     function WindowElements:CreateButton(Settings)
         Settings = Settings or {}
         local btn = Instance.new("TextButton")
@@ -265,7 +299,6 @@ function SynapseHub:CreateWindow(Settings)
             TweenService:Create(stroke, TweenInfo.new(0.15), {Color = Color3.fromRGB(45, 25, 70), Transparency = 0.4}):Play()
         end)
 
-        -- GERÇEKÇİ BASMA (SCALE) HİSSİYATI
         btn.MouseButton1Down:Connect(function()
             TweenService:Create(btn, TweenInfo.new(0.08, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Size = UDim2.new(0.96, 0, 0, 36)}):Play()
         end)
@@ -352,6 +385,7 @@ function SynapseHub:CreateWindow(Settings)
         local Min = Settings.Min or 0
         local Max = Settings.Max or 100
         local Default = Settings.Default or 50
+        local Step = Settings.Step or 10
 
         local frame = Instance.new("Frame")
         frame.Parent = Container
@@ -413,25 +447,44 @@ function SynapseHub:CreateWindow(Settings)
         fillCorner.Parent = sliderFill
 
         local draggingSlider = false
+        local lastSnappedVal = Default
+
+        local function updateSlider(input)
+            local pos = math.clamp((input.Position.X - sliderBar.AbsolutePosition.X) / sliderBar.AbsoluteSize.X, 0, 1)
+            local rawVal = Min + ((Max - Min) * pos)
+            
+            local snappedVal = math.floor(math.round(rawVal / Step) * Step)
+            snappedVal = math.clamp(snappedVal, Min, Max)
+            
+            local exactPos = (snappedVal - Min) / (Max - Min)
+            sliderFill.Size = UDim2.new(exactPos, 0, 1, 0)
+            valueLabel.Text = tostring(snappedVal)
+
+            if snappedVal ~= lastSnappedVal then
+                lastSnappedVal = snappedVal
+                pcall(Settings.Callback or function() end, snappedVal)
+            end
+        end
+
         sliderBar.InputBegan:Connect(function(input)
             if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
                 draggingSlider = true
+                updateSlider(input)
             end
         end)
+
         UserInputService.InputEnded:Connect(function(input)
             if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
                 draggingSlider = false
             end
         end)
+
         UserInputService.InputChanged:Connect(function(input)
             if draggingSlider and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-                local pos = math.clamp((input.Position.X - sliderBar.AbsolutePosition.X) / sliderBar.AbsoluteSize.X, 0, 1)
-                local val = math.floor(Min + ((Max - Min) * pos))
-                sliderFill.Size = UDim2.new(pos, 0, 1, 0)
-                valueLabel.Text = tostring(val)
-                pcall(Settings.Callback or function() end, val)
+                updateSlider(input)
             end
         end)
+
         return frame
     end
 
