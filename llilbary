@@ -1,5 +1,5 @@
 -- ========================================================
--- SYNAPSE HUB - Fixed Multi-Mode UI Library
+-- SYNAPSE HUB - Background Image Library (No Logo)
 -- ========================================================
 
 local SynapseHub = {}
@@ -40,6 +40,22 @@ function SynapseHub:CreateWindow(Settings)
     MainCorner.CornerRadius = UDim.new(0, 20)
     MainCorner.Parent = Main
 
+    -- İSTEDİĞİN ARKA PLAN GÖRSELİ (Asset ID: 14519355559)
+    local BgImage = Instance.new("ImageLabel")
+    BgImage.Name = "BgImage"
+    BgImage.Parent = Main
+    BgImage.Size = UDim2.new(1, 0, 1, 0)
+    BgImage.BackgroundTransparency = 1
+    BgImage.Image = "rbxassetid://14519355559"
+    BgImage.ScaleType = Enum.ScaleType.Slice
+    BgImage.SliceCenter = Rect.new(100, 100, 100, 100)
+    BgImage.ImageTransparency = 0.3 -- Şeffaflık ayarı
+    BgImage.ZIndex = 1
+
+    local BgCorner = Instance.new("UICorner")
+    BgCorner.CornerRadius = UDim.new(0, 20)
+    BgCorner.Parent = BgImage
+
     local ModalBlocker = Instance.new("TextButton")
     ModalBlocker.Name = "ModalBlocker"
     ModalBlocker.Parent = Main
@@ -47,6 +63,7 @@ function SynapseHub:CreateWindow(Settings)
     ModalBlocker.BackgroundTransparency = 1
     ModalBlocker.Text = ""
     ModalBlocker.Modal = true
+    ModalBlocker.ZIndex = 2
 
     local Shadow = Instance.new("ImageLabel")
     Shadow.Name = "Shadow"
@@ -80,7 +97,7 @@ function SynapseHub:CreateWindow(Settings)
     Content.Size = UDim2.new(1, 0, 1, 0)
     Content.BackgroundTransparency = 1
     Content.ClipsDescendants = true
-    Content.ZIndex = 2
+    Content.ZIndex = 3
 
     local ContentCorner = Instance.new("UICorner")
     ContentCorner.CornerRadius = UDim.new(0, 20)
@@ -91,12 +108,13 @@ function SynapseHub:CreateWindow(Settings)
     Header.Parent = Content
     Header.Size = UDim2.new(1, 0, 0, 50)
     Header.BackgroundTransparency = 1
-    Header.ZIndex = 3
+    Header.ZIndex = 4
 
+    -- Logo tamamen kaldırıldı, başlık sola alındı
     local Title = Instance.new("TextLabel")
     Title.Name = "Title"
     Title.Parent = Header
-    Title.Position = UDim2.new(0, 22, 0.5, -13)
+    Title.Position = UDim2.new(0, 20, 0.5, -13)
     Title.Size = UDim2.new(0, 250, 0, 26)
     Title.BackgroundTransparency = 1
     Title.Font = Enum.Font.GothamBlack
@@ -104,6 +122,7 @@ function SynapseHub:CreateWindow(Settings)
     Title.TextColor3 = Color3.fromRGB(235, 225, 250)
     Title.TextSize = 18
     Title.TextXAlignment = Enum.TextXAlignment.Left
+    Title.ZIndex = 4
 
     local TitleGradient = Instance.new("UIGradient")
     TitleGradient.Color = ColorSequence.new({
@@ -123,7 +142,7 @@ function SynapseHub:CreateWindow(Settings)
     CloseBtn.TextColor3 = Color3.fromRGB(170, 150, 200)
     CloseBtn.TextSize = 15
     CloseBtn.AutoButtonColor = false
-    CloseBtn.ZIndex = 4
+    CloseBtn.ZIndex = 5
 
     CloseBtn.MouseEnter:Connect(function()
         TweenService:Create(CloseBtn, TweenInfo.new(0.2), {TextColor3 = Color3.fromRGB(255, 70, 90)}):Play()
@@ -206,11 +225,12 @@ function SynapseHub:CreateWindow(Settings)
     Container.BorderSizePixel = 0
     Container.CanvasSize = UDim2.new(0, 0, 0, 0)
     Container.AutomaticCanvasSize = Enum.AutomaticSize.Y
+    Container.ZIndex = 4
 
     local UIList = Instance.new("UIListLayout")
     UIList.Parent = Container
     UIList.SortOrder = Enum.SortOrder.LayoutOrder
-    UIList.Padding = UDim.new(0, 10)
+    UIList.Padding = UDim.new(0, 8)
     UIList.HorizontalAlignment = Enum.HorizontalAlignment.Center
 
     local UserFooter = Instance.new("Frame")
@@ -219,6 +239,7 @@ function SynapseHub:CreateWindow(Settings)
     UserFooter.Position = UDim2.new(0, 22, 1, -38)
     UserFooter.Size = UDim2.new(1, -44, 0, 30)
     UserFooter.BackgroundTransparency = 1
+    UserFooter.ZIndex = 4
 
     local UserAvatar = Instance.new("ImageLabel")
     UserAvatar.Name = "UserAvatar"
@@ -227,6 +248,7 @@ function SynapseHub:CreateWindow(Settings)
     UserAvatar.Size = UDim2.new(0, 24, 0, 24)
     UserAvatar.BackgroundTransparency = 1
     UserAvatar.Image = "rbxthumb://type=AvatarHeadShot&id=" .. LocalPlayer.UserId .. "&w=150&h=150"
+    UserAvatar.ZIndex = 4
 
     local AvatarCorner = Instance.new("UICorner")
     AvatarCorner.CornerRadius = UDim.new(1, 0)
@@ -243,6 +265,7 @@ function SynapseHub:CreateWindow(Settings)
     UserName.TextColor3 = Color3.fromRGB(190, 175, 215)
     UserName.TextSize = 12
     UserName.TextXAlignment = Enum.TextXAlignment.Left
+    UserName.ZIndex = 4
 
     local StatusText = Instance.new("TextLabel")
     StatusText.Name = "StatusText"
@@ -255,202 +278,114 @@ function SynapseHub:CreateWindow(Settings)
     StatusText.TextColor3 = Color3.fromRGB(80, 190, 130)
     StatusText.TextSize = 10
     StatusText.TextXAlignment = Enum.TextXAlignment.Right
+    StatusText.ZIndex = 4
 
     local WindowElements = {}
 
-    local function applyButtonStyles(btn)
+    function WindowElements:CreateButton(Settings)
+        Settings = Settings or {}
+        local btn = Instance.new("TextButton")
+        btn.Parent = Container
+        btn.Size = UDim2.new(1, 0, 0, 40)
+        btn.BackgroundColor3 = Color3.fromRGB(14, 10, 22)
+        btn.BackgroundTransparency = 0.2
+        btn.AutoButtonColor = false
+        btn.Font = Enum.Font.GothamMedium
+        btn.Text = Settings.Name or ""
+        btn.TextColor3 = Color3.fromRGB(200, 190, 220)
+        btn.TextSize = 13
+        btn.ZIndex = 5
+
         local corner = Instance.new("UICorner")
-        corner.CornerRadius = UDim.new(0, 12)
+        corner.CornerRadius = UDim.new(0, 10)
         corner.Parent = btn
 
         local stroke = Instance.new("UIStroke")
         stroke.Parent = btn
-        stroke.Color = Color3.fromRGB(60, 30, 95)
-        stroke.Thickness = 1.4
-        stroke.Transparency = 0.3
+        stroke.Color = Color3.fromRGB(45, 25, 70)
+        stroke.Thickness = 1.2
+        stroke.Transparency = 0.4
 
         btn.MouseEnter:Connect(function()
-            TweenService:Create(btn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(36, 20, 60), TextColor3 = Color3.fromRGB(255, 255, 255)}):Play()
-            TweenService:Create(stroke, TweenInfo.new(0.15), {Color = Color3.fromRGB(150, 70, 220), Transparency = 0}):Play()
+            TweenService:Create(btn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(32, 18, 52), TextColor3 = Color3.fromRGB(255, 255, 255)}):Play()
+            TweenService:Create(stroke, TweenInfo.new(0.15), {Color = Color3.fromRGB(130, 60, 200), Transparency = 0}):Play()
         end)
 
         btn.MouseLeave:Connect(function()
-            TweenService:Create(btn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(16, 11, 26), TextColor3 = Color3.fromRGB(220, 210, 240)}):Play()
-            TweenService:Create(stroke, TweenInfo.new(0.15), {Color = Color3.fromRGB(60, 30, 95), Transparency = 0.3}):Play()
+            TweenService:Create(btn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(14, 10, 22), TextColor3 = Color3.fromRGB(200, 190, 220)}):Play()
+            TweenService:Create(stroke, TweenInfo.new(0.15), {Color = Color3.fromRGB(45, 25, 70), Transparency = 0.4}):Play()
         end)
+
+        btn.MouseButton1Down:Connect(function()
+            TweenService:Create(btn, TweenInfo.new(0.08, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Size = UDim2.new(0.96, 0, 0, 36)}):Play()
+        end)
+
+        btn.MouseButton1Up:Connect(function()
+            TweenService:Create(btn, TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Size = UDim2.new(1, 0, 0, 40)}):Play()
+            pcall(Settings.Callback or function() end)
+        end)
+
+        return btn
     end
 
-    -- 1. TOMBUL MENÜ (En fazla 3 buton, boşluksuz ve büyük)
-    function WindowElements:CreateChunkyGroup(ButtonsData)
+    function WindowElements:CreateButtonRow(ButtonsData)
         ButtonsData = ButtonsData or {}
-        local count = #ButtonsData
-        if count == 0 then return end
-        if count > 3 then count = 3 end
-
         local rowFrame = Instance.new("Frame")
         rowFrame.Parent = Container
+        rowFrame.Size = UDim2.new(1, 0, 0, 40)
         rowFrame.BackgroundTransparency = 1
+        rowFrame.ZIndex = 5
 
-        if count == 1 then
-            rowFrame.Size = UDim2.new(1, 0, 0, 95)
-            local btn = Instance.new("TextButton")
-            btn.Parent = rowFrame
-            btn.Size = UDim2.new(1, 0, 1, 0)
-            btn.AutoButtonColor = false
-            btn.Font = Enum.Font.GothamBold
-            btn.Text = ButtonsData[1].Name or "Buton"
-            btn.TextColor3 = Color3.fromRGB(220, 210, 240)
-            btn.TextSize = 16
-            btn.BackgroundColor3 = Color3.fromRGB(16, 11, 26)
-            btn.BackgroundTransparency = 0.15
-
-            applyButtonStyles(btn)
-            btn.MouseButton1Click:Connect(function()
-                if ButtonsData[1].Callback then
-                    pcall(ButtonsData[1].Callback)
-                end
-            end)
-
-        elseif count == 2 then
-            rowFrame.Size = UDim2.new(1, 0, 0, 56)
-            for i = 1, 2 do
-                local data = ButtonsData[i]
-                local btn = Instance.new("TextButton")
-                btn.Parent = rowFrame
-                btn.Size = UDim2.new(0.48, 0, 1, 0)
-                btn.Position = UDim2.new((i - 1) * 0.52, 0, 0, 0)
-                btn.AutoButtonColor = false
-                btn.Font = Enum.Font.GothamBold
-                btn.Text = data.Name or "Buton"
-                btn.TextColor3 = Color3.fromRGB(220, 210, 240)
-                btn.TextSize = 14
-                btn.BackgroundColor3 = Color3.fromRGB(16, 11, 26)
-                btn.BackgroundTransparency = 0.15
-
-                applyButtonStyles(btn)
-                btn.MouseButton1Click:Connect(function()
-                    if data.Callback then
-                        pcall(data.Callback)
-                    end
-                end)
-            end
-
-        elseif count == 3 then
-            rowFrame.Size = UDim2.new(1, 0, 0, 122)
-
-            for i = 1, 2 do
-                local data = ButtonsData[i]
-                local btn = Instance.new("TextButton")
-                btn.Parent = rowFrame
-                btn.Size = UDim2.new(0.48, 0, 0, 56)
-                btn.Position = UDim2.new((i - 1) * 0.52, 0, 0, 0)
-                btn.AutoButtonColor = false
-                btn.Font = Enum.Font.GothamBold
-                btn.Text = data.Name or "Buton"
-                btn.TextColor3 = Color3.fromRGB(220, 210, 240)
-                btn.TextSize = 14
-                btn.BackgroundColor3 = Color3.fromRGB(16, 11, 26)
-                btn.BackgroundTransparency = 0.15
-
-                applyButtonStyles(btn)
-                btn.MouseButton1Click:Connect(function()
-                    if data.Callback then
-                        pcall(data.Callback)
-                    end
-                end)
-            end
-
-            local data3 = ButtonsData[3]
-            local btn3 = Instance.new("TextButton")
-            btn3.Parent = rowFrame
-            btn3.Size = UDim2.new(1, 0, 0, 56)
-            btn3.Position = UDim2.new(0, 0, 0, 66)
-            btn3.AutoButtonColor = false
-            btn3.Font = Enum.Font.GothamBold
-            btn3.Text = data3.Name or "Buton"
-            btn3.TextColor3 = Color3.fromRGB(220, 210, 240)
-            btn3.TextSize = 14
-            btn3.BackgroundColor3 = Color3.fromRGB(16, 11, 26)
-            btn3.BackgroundTransparency = 0.15
-
-            applyButtonStyles(btn3)
-            btn3.MouseButton1Click:Connect(function()
-                if data3.Callback then
-                    pcall(data3.Callback)
-                end
-            end)
-        end
-
-        return rowFrame
-    end
-
-    -- 2. TAM BOYUT MENÜ (Sonsuz Butonlu)
-    function WindowElements:CreateFullMenu(ButtonsData)
-        ButtonsData = ButtonsData or {}
-        local groupFrame = Instance.new("Frame")
-        groupFrame.Parent = Container
-        groupFrame.Size = UDim2.new(1, 0, 0, #ButtonsData * 62)
-        groupFrame.BackgroundTransparency = 1
-
-        local list = Instance.new("UIListLayout")
-        list.Parent = groupFrame
-        list.SortOrder = Enum.SortOrder.LayoutOrder
-        list.Padding = UDim.new(0, 6)
-
-        for _, data in ipairs(ButtonsData) do
-            local btn = Instance.new("TextButton")
-            btn.Parent = groupFrame
-            btn.Size = UDim2.new(1, 0, 0, 56)
-            btn.AutoButtonColor = false
-            btn.Font = Enum.Font.GothamBold
-            btn.Text = data.Name or "Buton"
-            btn.TextColor3 = Color3.fromRGB(220, 210, 240)
-            btn.TextSize = 14
-            btn.BackgroundColor3 = Color3.fromRGB(16, 11, 26)
-            btn.BackgroundTransparency = 0.15
-
-            applyButtonStyles(btn)
-            btn.MouseButton1Click:Connect(function()
-                if data.Callback then
-                    pcall(data.Callback)
-                end
-            end)
-        end
-
-        return groupFrame
-    end
-
-    -- 3. DİKEY MENÜ (Sonsuz Butonlu, İkili Kolon)
-    function WindowElements:CreateVerticalMenu(ButtonsData)
-        ButtonsData = ButtonsData or {}
-        local groupFrame = Instance.new("Frame")
-        groupFrame.Parent = Container
-        groupFrame.Size = UDim2.new(1, 0, 0, math.ceil(#ButtonsData / 2) * 56 + math.floor(#ButtonsData / 2) * 6)
-        groupFrame.BackgroundTransparency = 1
-
+        local count = #ButtonsData
         for i, data in ipairs(ButtonsData) do
             local btn = Instance.new("TextButton")
-            btn.Parent = groupFrame
-            local isEven = (i % 2 == 0)
-            btn.Size = UDim2.new(0.48, 0, 0, 50)
-            btn.Position = UDim2.new(isEven and 0.52 or 0, 0, 0, math.floor((i - 1) / 2) * 56)
+            btn.Parent = rowFrame
             btn.AutoButtonColor = false
-            btn.Font = Enum.Font.GothamBold
+            btn.Font = Enum.Font.GothamMedium
             btn.Text = data.Name or "Buton"
-            btn.TextColor3 = Color3.fromRGB(220, 210, 240)
+            btn.TextColor3 = Color3.fromRGB(200, 190, 220)
             btn.TextSize = 13
-            btn.BackgroundColor3 = Color3.fromRGB(16, 11, 26)
-            btn.BackgroundTransparency = 0.15
+            btn.BackgroundColor3 = Color3.fromRGB(14, 10, 22)
+            btn.BackgroundTransparency = 0.2
+            btn.ZIndex = 5
 
-            applyButtonStyles(btn)
-            btn.MouseButton1Click:Connect(function()
-                if data.Callback then
-                    pcall(data.Callback)
-                end
+            if count == 2 then
+                btn.Size = UDim2.new(0.48, 0, 1, 0)
+                btn.Position = UDim2.new((i - 1) * 0.52, 0, 0, 0)
+            else
+                btn.Size = UDim2.new(1, 0, 1, 0)
+            end
+
+            local corner = Instance.new("UICorner")
+            corner.CornerRadius = UDim.new(0, 10)
+            corner.Parent = btn
+
+            local stroke = Instance.new("UIStroke")
+            stroke.Parent = btn
+            stroke.Color = Color3.fromRGB(45, 25, 70)
+            stroke.Thickness = 1.2
+            stroke.Transparency = 0.4
+
+            btn.MouseEnter:Connect(function()
+                TweenService:Create(btn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(32, 18, 52), TextColor3 = Color3.fromRGB(255, 255, 255)}):Play()
+                TweenService:Create(stroke, TweenInfo.new(0.15), {Color = Color3.fromRGB(130, 60, 200), Transparency = 0}):Play()
+            end)
+
+            btn.MouseLeave:Connect(function()
+                TweenService:Create(btn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(14, 10, 22), TextColor3 = Color3.fromRGB(200, 190, 220)}):Play()
+                TweenService:Create(stroke, TweenInfo.new(0.15), {Color = Color3.fromRGB(45, 25, 70), Transparency = 0.4}):Play()
+            end)
+
+            btn.MouseButton1Down:Connect(function()
+                TweenService:Create(btn, TweenInfo.new(0.08, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Size = UDim2.new(btn.Size.X.Scale * 0.95, 0, 0.9, 0)}):Play()
+            end)
+
+            btn.MouseButton1Up:Connect(function()
+                TweenService:Create(btn, TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Size = count == 2 and UDim2.new(0.48, 0, 1, 0) or UDim2.new(1, 0, 1, 0)}):Play()
+                pcall(data.Callback or function() end)
             end)
         end
-
-        return groupFrame
+        return rowFrame
     end
 
     function WindowElements:CreateToggle(Settings)
@@ -458,11 +393,12 @@ function SynapseHub:CreateWindow(Settings)
         local toggled = Settings.Default or false
         local frame = Instance.new("TextButton")
         frame.Parent = Container
-        frame.Size = UDim2.new(1, 0, 0, 48)
+        frame.Size = UDim2.new(1, 0, 0, 40)
         frame.BackgroundColor3 = Color3.fromRGB(14, 10, 22)
         frame.BackgroundTransparency = 0.2
         frame.AutoButtonColor = false
         frame.Text = ""
+        frame.ZIndex = 5
 
         local corner = Instance.new("UICorner")
         corner.CornerRadius = UDim.new(0, 10)
@@ -484,6 +420,7 @@ function SynapseHub:CreateWindow(Settings)
         label.TextColor3 = Color3.fromRGB(200, 190, 220)
         label.TextSize = 13
         label.TextXAlignment = Enum.TextXAlignment.Left
+        label.ZIndex = 5
 
         local switch = Instance.new("Frame")
         switch.Parent = frame
@@ -491,6 +428,7 @@ function SynapseHub:CreateWindow(Settings)
         switch.Position = UDim2.new(1, -14, 0.5, 0)
         switch.Size = UDim2.new(0, 40, 0, 20)
         switch.BackgroundColor3 = toggled and Color3.fromRGB(130, 60, 200) or Color3.fromRGB(25, 18, 38)
+        switch.ZIndex = 5
 
         local switchCorner = Instance.new("UICorner")
         switchCorner.CornerRadius = UDim.new(1, 0)
@@ -502,18 +440,216 @@ function SynapseHub:CreateWindow(Settings)
         circle.Position = toggled and UDim2.new(1, -18, 0.5, 0) or UDim2.new(0, 2, 0.5, 0)
         circle.Size = UDim2.new(0, 16, 0, 16)
         circle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+        circle.ZIndex = 5
 
         local circleCorner = Instance.new("UICorner")
         circleCorner.CornerRadius = UDim.new(1, 0)
         circleCorner.Parent = circle
 
+        frame.MouseButton1Down:Connect(function()
+            TweenService:Create(frame, TweenInfo.new(0.08), {Size = UDim2.new(0.96, 0, 0, 36)}):Play()
+        end)
+
         frame.MouseButton1Up:Connect(function()
+            TweenService:Create(frame, TweenInfo.new(0.1), {Size = UDim2.new(1, 0, 0, 40)}):Play()
             toggled = not toggled
             TweenService:Create(switch, TweenInfo.new(0.2), {BackgroundColor3 = toggled and Color3.fromRGB(130, 60, 200) or Color3.fromRGB(25, 18, 38)}):Play()
             TweenService:Create(circle, TweenInfo.new(0.2), {Position = toggled and UDim2.new(1, -18, 0.5, 0) or UDim2.new(0, 2, 0.5, 0)}):Play()
-            if Settings.Callback then
-                pcall(Settings.Callback, toggled)
+            pcall(Settings.Callback or function() end, toggled)
+        end)
+
+        return frame
+    end
+
+    function WindowElements:CreateSlider(Settings)
+        Settings = Settings or {}
+        local Min = Settings.Min or 0
+        local Max = Settings.Max or 100
+        local Default = Settings.Default or 50
+        local Step = Settings.Step or 10
+
+        local frame = Instance.new("Frame")
+        frame.Parent = Container
+        frame.Size = UDim2.new(1, 0, 0, 52)
+        frame.BackgroundColor3 = Color3.fromRGB(14, 10, 22)
+        frame.BackgroundTransparency = 0.2
+        frame.ZIndex = 5
+
+        local corner = Instance.new("UICorner")
+        corner.CornerRadius = UDim.new(0, 10)
+        corner.Parent = frame
+
+        local stroke = Instance.new("UIStroke")
+        stroke.Parent = frame
+        stroke.Color = Color3.fromRGB(45, 25, 70)
+        stroke.Thickness = 1.2
+        stroke.Transparency = 0.4
+
+        local label = Instance.new("TextLabel")
+        label.Parent = frame
+        label.Position = UDim2.new(0, 14, 0, 6)
+        label.Size = UDim2.new(0.7, 0, 0, 18)
+        label.BackgroundTransparency = 1
+        label.Font = Enum.Font.GothamMedium
+        label.Text = Settings.Name or ""
+        label.TextColor3 = Color3.fromRGB(200, 190, 220)
+        label.TextSize = 13
+        label.TextXAlignment = Enum.TextXAlignment.Left
+        label.ZIndex = 5
+
+        local valueLabel = Instance.new("TextLabel")
+        valueLabel.Parent = frame
+        valueLabel.Position = UDim2.new(0.7, 0, 0, 6)
+        valueLabel.Size = UDim2.new(0.3, -14, 0, 18)
+        valueLabel.BackgroundTransparency = 1
+        valueLabel.Font = Enum.Font.GothamBold
+        valueLabel.Text = tostring(Default)
+        valueLabel.TextColor3 = Color3.fromRGB(170, 100, 240)
+        valueLabel.TextSize = 13
+        valueLabel.TextXAlignment = Enum.TextXAlignment.Right
+        valueLabel.ZIndex = 5
+
+        local sliderBar = Instance.new("TextButton")
+        sliderBar.Parent = frame
+        sliderBar.Position = UDim2.new(0, 14, 0, 32)
+        sliderBar.Size = UDim2.new(1, -28, 0, 6)
+        sliderBar.BackgroundColor3 = Color3.fromRGB(25, 18, 38)
+        sliderBar.AutoButtonColor = false
+        sliderBar.Text = ""
+        sliderBar.ZIndex = 5
+
+        local barCorner = Instance.new("UICorner")
+        barCorner.CornerRadius = UDim.new(1, 0)
+        barCorner.Parent = sliderBar
+
+        local sliderFill = Instance.new("Frame")
+        sliderFill.Parent = sliderBar
+        sliderFill.Size = UDim2.new((Default - Min) / (Max - Min), 0, 1, 0)
+        sliderFill.BackgroundColor3 = Color3.fromRGB(130, 60, 200)
+        sliderFill.ZIndex = 5
+
+        local fillCorner = Instance.new("UICorner")
+        fillCorner.CornerRadius = UDim.new(1, 0)
+        fillCorner.Parent = sliderFill
+
+        local draggingSlider = false
+        local lastSnappedVal = Default
+
+        local function updateSlider(input)
+            local pos = math.clamp((input.Position.X - sliderBar.AbsolutePosition.X) / sliderBar.AbsoluteSize.X, 0, 1)
+            local rawVal = Min + ((Max - Min) * pos)
+            
+            local snappedVal = math.floor(math.round(rawVal / Step) * Step)
+            snappedVal = math.clamp(snappedVal, Min, Max)
+            
+            local exactPos = (snappedVal - Min) / (Max - Min)
+            
+            TweenService:Create(sliderFill, TweenInfo.new(0.08, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+                Size = UDim2.new(exactPos, 0, 1, 0)
+            }):Play()
+            
+            valueLabel.Text = tostring(snappedVal)
+
+            if snappedVal ~= lastSnappedVal then
+                lastSnappedVal = snappedVal
+                pcall(Settings.Callback or function() end, snappedVal)
             end
+        end
+
+        sliderBar.InputBegan:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+                draggingSlider = true
+                updateSlider(input)
+            end
+        end)
+
+        UserInputService.InputEnded:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+                draggingSlider = false
+            end
+        end)
+
+        UserInputService.InputChanged:Connect(function(input)
+            if draggingSlider and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+                updateSlider(input)
+            end
+        end)
+
+        return frame
+    end
+
+    function WindowElements:CreateTextBox(Settings)
+        Settings = Settings or {}
+        local frame = Instance.new("Frame")
+        frame.Parent = Container
+        frame.Size = UDim2.new(1, 0, 0, 52)
+        frame.BackgroundColor3 = Color3.fromRGB(14, 10, 22)
+        frame.BackgroundTransparency = 0.2
+        frame.ZIndex = 5
+
+        local corner = Instance.new("UICorner")
+        corner.CornerRadius = UDim.new(0, 10)
+        corner.Parent = frame
+
+        local stroke = Instance.new("UIStroke")
+        stroke.Parent = frame
+        stroke.Color = Color3.fromRGB(45, 25, 70)
+        stroke.Thickness = 1.2
+        stroke.Transparency = 0.4
+
+        local label = Instance.new("TextLabel")
+        label.Parent = frame
+        label.Position = UDim2.new(0, 14, 0, 4)
+        label.Size = UDim2.new(1, -28, 0, 16)
+        label.BackgroundTransparency = 1
+        label.Font = Enum.Font.GothamMedium
+        label.Text = Settings.Name or ""
+        label.TextColor3 = Color3.fromRGB(200, 190, 220)
+        label.TextSize = 12
+        label.TextXAlignment = Enum.TextXAlignment.Left
+        label.ZIndex = 5
+
+        local textBox = Instance.new("TextBox")
+        textBox.Parent = frame
+        textBox.Position = UDim2.new(0, 14, 0, 22)
+        textBox.Size = UDim2.new(1, -28, 0, 24)
+        textBox.BackgroundColor3 = Color3.fromRGB(22, 15, 35)
+        textBox.BackgroundTransparency = 0.3
+        textBox.Font = Enum.Font.Gotham
+        textBox.PlaceholderText = Settings.Placeholder or ""
+        textBox.PlaceholderColor3 = Color3.fromRGB(120, 110, 140)
+        textBox.Text = ""
+        textBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+        textBox.TextSize = 12
+        textBox.ClearTextOnFocus = false
+        textBox.ZIndex = 5
+
+        local boxCorner = Instance.new("UICorner")
+        boxCorner.CornerRadius = UDim.new(0, 6)
+        boxCorner.Parent = textBox
+
+        local boxStroke = Instance.new("UIStroke")
+        boxStroke.Parent = textBox
+        boxStroke.Color = Color3.fromRGB(130, 60, 200)
+        boxStroke.Transparency = 1
+
+        textBox.Focused:Connect(function()
+            TweenService:Create(textBox, TweenInfo.new(0.2), {
+                BackgroundColor3 = Color3.fromRGB(32, 22, 50),
+                Size = UDim2.new(1, -20, 0, 26),
+                Position = UDim2.new(0, 10, 0, 21)
+            }):Play()
+            TweenService:Create(boxStroke, TweenInfo.new(0.2), {Transparency = 0}):Play()
+        end)
+
+        textBox.FocusLost:Connect(function(enterPressed)
+            TweenService:Create(textBox, TweenInfo.new(0.2), {
+                BackgroundColor3 = Color3.fromRGB(22, 15, 35),
+                Size = UDim2.new(1, -28, 0, 24),
+                Position = UDim2.new(0, 14, 0, 22)
+            }):Play()
+            TweenService:Create(boxStroke, TweenInfo.new(0.2), {Transparency = 1}):Play()
+            pcall(Settings.Callback or function() end, textBox.Text)
         end)
 
         return frame
@@ -524,6 +660,7 @@ function SynapseHub:CreateWindow(Settings)
         labelFrame.Parent = Container
         labelFrame.Size = UDim2.new(1, 0, 0, 28)
         labelFrame.BackgroundTransparency = 1
+        labelFrame.ZIndex = 5
 
         local textLabel = Instance.new("TextLabel")
         textLabel.Parent = labelFrame
@@ -535,6 +672,7 @@ function SynapseHub:CreateWindow(Settings)
         textLabel.TextColor3 = Color3.fromRGB(160, 130, 200)
         textLabel.TextSize = 12
         textLabel.TextXAlignment = Enum.TextXAlignment.Left
+        textLabel.ZIndex = 5
         return labelFrame
     end
 
