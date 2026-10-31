@@ -1,5 +1,5 @@
 -- ========================================================
--- SYNAPSE HUB - Final Perfect Circular Logo Intro Library
+-- SYNAPSE HUB - Fixed AspectType Library
 -- ========================================================
 
 local SynapseHub = {}
@@ -80,7 +80,7 @@ function SynapseHub:CreateWindow(Settings)
     LogoCorner.Parent = LogoContainer
 
     local AspectRatio = Instance.new("UIAspectRatioConstraint")
-    AspectRatio.AspectType = Enum.AspectType.FitWithoutParentSizeConstraints
+    AspectRatio.AspectType = Enum.AspectType.Fit
     AspectRatio.DominantAxis = Enum.DominantAxis.Width
     AspectRatio.AspectRatio = 1
     AspectRatio.Parent = LogoContainer
