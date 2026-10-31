@@ -1,5 +1,5 @@
 -- ========================================================
--- SYNAPSE HUB - Workspace Auto-Download Intro & Fluid Library
+-- SYNAPSE HUB - Larger & Circular Logo Intro Library
 -- ========================================================
 
 local SynapseHub = {}
@@ -30,13 +30,11 @@ function SynapseHub:CreateWindow(Settings)
     ScreenGui.Parent = CoreGui
     ScreenGui.ResetOnSpawn = false
 
-    -- GÖRSELİ INTERNETTEN İNDİRİP WORKSPACE'E KAYDETME VE OKUMA
-    local logoAsset = "rbxassetid://6014261993" -- Yedek ID
+    -- GÖRSELİ INTERNETTEN İNDİRİP WORKSPACE'E KAYDETME
+    local logoAsset = "rbxassetid://6014261993"
     pcall(function()
         local fileName = "synapse_logo.png"
         if writefile and readfile and isfile and httpget or game:GetService("HttpService") then
-            local HttpService = game:GetService("HttpService")
-            -- Eğer dosya workspace'de yoksa veya güncellenecekse postimg'den indir kaydet
             if not isfile(fileName) then
                 local success, response = pcall(function()
                     return game:HttpGet("https://i.postimg.cc/25g0Y0Z5/IMG-20261025-154838-506.jpg")
@@ -46,14 +44,13 @@ function SynapseHub:CreateWindow(Settings)
                 end
             end
             
-            -- Workspace'den özel asset olarak yansıt
             if isfile(fileName) and getcustomasset then
                 logoAsset = getcustomasset(fileName)
             end
         end
     end)
 
-    -- SİNEMATİK AÇILIŞ (Buğulu Arkaplan ve Workspace Logosu)
+    -- SİNEMATİK AÇILIŞ (Buğulu Arkaplan ve Daha Büyük, Yuvarlak Logo)
     local IntroGui = Instance.new("Frame")
     IntroGui.Name = "IntroGui"
     IntroGui.Parent = ScreenGui
@@ -72,13 +69,13 @@ function SynapseHub:CreateWindow(Settings)
     LogoContainer.Parent = IntroGui
     LogoContainer.AnchorPoint = Vector2.new(0.5, 0.5)
     LogoContainer.Position = UDim2.new(0.5, 0, 0.5, 0)
-    LogoContainer.Size = UDim2.new(0, 130, 0, 130)
+    LogoContainer.Size = UDim2.new(0, 180, 0, 180) -- Boyutunu büyüttük (180x180)
     LogoContainer.BackgroundTransparency = 1
     LogoContainer.ClipsDescendants = true
     LogoContainer.ZIndex = 101
 
     local LogoCorner = Instance.new("UICorner")
-    LogoCorner.CornerRadius = UDim.new(1, 0)
+    LogoCorner.CornerRadius = UDim.new(1, 0) -- Tam yuvarlak (daire) maske
     LogoCorner.Parent = LogoContainer
 
     local LogoImage = Instance.new("ImageLabel")
@@ -89,7 +86,7 @@ function SynapseHub:CreateWindow(Settings)
     LogoImage.Image = logoAsset
     LogoImage.ZIndex = 102
 
-    -- ANA MENÜ (Arka planda hazır bekler)
+    -- ANA MENÜ
     local Main = Instance.new("Frame")
     Main.Name = "Main"
     Main.Parent = ScreenGui
