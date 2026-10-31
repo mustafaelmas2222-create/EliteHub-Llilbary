@@ -1,5 +1,5 @@
 -- ========================================================
--- SYNAPSE HUB - Workspace Logo Loader Library
+-- SYNAPSE HUB - Fixed Background Image Library
 -- ========================================================
 
 local SynapseHub = {}
@@ -33,24 +33,23 @@ function SynapseHub:CreateWindow(Settings)
     Main.Position = UDim2.new(0.5, 0, 0.5, 0)
     Main.Size = UDim2.new(0, 480, 0, 320)
     Main.BackgroundColor3 = Color3.fromRGB(8, 6, 12)
-    Main.BackgroundTransparency = 0.15
+    Main.BackgroundTransparency = 1 -- Arka plan resminin tam görünmesi için şeffaf yaptık
     Main.ClipsDescendants = false
 
     local MainCorner = Instance.new("UICorner")
     MainCorner.CornerRadius = UDim.new(0, 20)
     MainCorner.Parent = Main
 
-    -- İSTEDİĞİN ARKA PLAN GÖRSELİ (Asset ID: 14519355559)
+    -- ARKA PLAN GÖRSELİ (14519355559)
     local BgImage = Instance.new("ImageLabel")
     BgImage.Name = "BgImage"
     BgImage.Parent = Main
     BgImage.Size = UDim2.new(1, 0, 1, 0)
     BgImage.BackgroundTransparency = 1
     BgImage.Image = "rbxassetid://14519355559"
-    BgImage.ScaleType = Enum.ScaleType.Slice
-    BgImage.SliceCenter = Rect.new(100, 100, 100, 100)
-    BgImage.ImageTransparency = 0.2
-    BgImage.ZIndex = 1
+    BgImage.ScaleType = Enum.ScaleType.Stretch
+    BgImage.ImageTransparency = 0.1 -- Görselin netliği
+    BgImage.ZIndex = 0
 
     local BgCorner = Instance.new("UICorner")
     BgCorner.CornerRadius = UDim.new(0, 20)
@@ -63,7 +62,7 @@ function SynapseHub:CreateWindow(Settings)
     ModalBlocker.BackgroundTransparency = 1
     ModalBlocker.Text = ""
     ModalBlocker.Modal = true
-    ModalBlocker.ZIndex = 2
+    ModalBlocker.ZIndex = 1
 
     local Shadow = Instance.new("ImageLabel")
     Shadow.Name = "Shadow"
@@ -75,7 +74,7 @@ function SynapseHub:CreateWindow(Settings)
     Shadow.Image = "rbxassetid://6014261993"
     Shadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
     Shadow.ImageTransparency = 0.5
-    Shadow.ZIndex = 0
+    Shadow.ZIndex = -1
 
     local MainStroke = Instance.new("UIStroke")
     MainStroke.Parent = Main
@@ -97,7 +96,7 @@ function SynapseHub:CreateWindow(Settings)
     Content.Size = UDim2.new(1, 0, 1, 0)
     Content.BackgroundTransparency = 1
     Content.ClipsDescendants = true
-    Content.ZIndex = 3
+    Content.ZIndex = 2
 
     local ContentCorner = Instance.new("UICorner")
     ContentCorner.CornerRadius = UDim.new(0, 20)
@@ -108,21 +107,20 @@ function SynapseHub:CreateWindow(Settings)
     Header.Parent = Content
     Header.Size = UDim2.new(1, 0, 0, 50)
     Header.BackgroundTransparency = 1
-    Header.ZIndex = 4
+    Header.ZIndex = 3
 
-    -- LOGO TAMAMEN KALDIRILDI VE BAŞLIK SOLA ALINDI
     local Title = Instance.new("TextLabel")
     Title.Name = "Title"
     Title.Parent = Header
     Title.Position = UDim2.new(0, 20, 0.5, -13)
-    Title.Size = UDim2.new(0, 220, 0, 26)
+    Title.Size = UDim2.new(0, 250, 0, 26)
     Title.BackgroundTransparency = 1
     Title.Font = Enum.Font.GothamBlack
     Title.Text = string.upper(WindowName)
     Title.TextColor3 = Color3.fromRGB(235, 225, 250)
     Title.TextSize = 18
     Title.TextXAlignment = Enum.TextXAlignment.Left
-    Title.ZIndex = 4
+    Title.ZIndex = 3
 
     local TitleGradient = Instance.new("UIGradient")
     TitleGradient.Color = ColorSequence.new({
@@ -142,7 +140,7 @@ function SynapseHub:CreateWindow(Settings)
     CloseBtn.TextColor3 = Color3.fromRGB(170, 150, 200)
     CloseBtn.TextSize = 15
     CloseBtn.AutoButtonColor = false
-    CloseBtn.ZIndex = 5
+    CloseBtn.ZIndex = 4
 
     CloseBtn.MouseEnter:Connect(function()
         TweenService:Create(CloseBtn, TweenInfo.new(0.2), {TextColor3 = Color3.fromRGB(255, 70, 90)}):Play()
@@ -225,7 +223,7 @@ function SynapseHub:CreateWindow(Settings)
     Container.BorderSizePixel = 0
     Container.CanvasSize = UDim2.new(0, 0, 0, 0)
     Container.AutomaticCanvasSize = Enum.AutomaticSize.Y
-    Container.ZIndex = 4
+    Container.ZIndex = 3
 
     local UIList = Instance.new("UIListLayout")
     UIList.Parent = Container
@@ -239,7 +237,7 @@ function SynapseHub:CreateWindow(Settings)
     UserFooter.Position = UDim2.new(0, 22, 1, -38)
     UserFooter.Size = UDim2.new(1, -44, 0, 30)
     UserFooter.BackgroundTransparency = 1
-    UserFooter.ZIndex = 4
+    UserFooter.ZIndex = 3
 
     local UserAvatar = Instance.new("ImageLabel")
     UserAvatar.Name = "UserAvatar"
@@ -248,7 +246,7 @@ function SynapseHub:CreateWindow(Settings)
     UserAvatar.Size = UDim2.new(0, 24, 0, 24)
     UserAvatar.BackgroundTransparency = 1
     UserAvatar.Image = "rbxthumb://type=AvatarHeadShot&id=" .. LocalPlayer.UserId .. "&w=150&h=150"
-    UserAvatar.ZIndex = 4
+    UserAvatar.ZIndex = 3
 
     local AvatarCorner = Instance.new("UICorner")
     AvatarCorner.CornerRadius = UDim.new(1, 0)
@@ -265,7 +263,7 @@ function SynapseHub:CreateWindow(Settings)
     UserName.TextColor3 = Color3.fromRGB(190, 175, 215)
     UserName.TextSize = 12
     UserName.TextXAlignment = Enum.TextXAlignment.Left
-    UserName.ZIndex = 4
+    UserName.ZIndex = 3
 
     local StatusText = Instance.new("TextLabel")
     StatusText.Name = "StatusText"
@@ -278,7 +276,7 @@ function SynapseHub:CreateWindow(Settings)
     StatusText.TextColor3 = Color3.fromRGB(80, 190, 130)
     StatusText.TextSize = 10
     StatusText.TextXAlignment = Enum.TextXAlignment.Right
-    StatusText.ZIndex = 4
+    StatusText.ZIndex = 3
 
     local WindowElements = {}
 
@@ -294,7 +292,7 @@ function SynapseHub:CreateWindow(Settings)
         btn.Text = Settings.Name or ""
         btn.TextColor3 = Color3.fromRGB(200, 190, 220)
         btn.TextSize = 13
-        btn.ZIndex = 5
+        btn.ZIndex = 4
 
         local corner = Instance.new("UICorner")
         corner.CornerRadius = UDim.new(0, 10)
@@ -334,7 +332,7 @@ function SynapseHub:CreateWindow(Settings)
         rowFrame.Parent = Container
         rowFrame.Size = UDim2.new(1, 0, 0, 40)
         rowFrame.BackgroundTransparency = 1
-        rowFrame.ZIndex = 5
+        rowFrame.ZIndex = 4
 
         local count = #ButtonsData
         for i, data in ipairs(ButtonsData) do
@@ -347,7 +345,7 @@ function SynapseHub:CreateWindow(Settings)
             btn.TextSize = 13
             btn.BackgroundColor3 = Color3.fromRGB(14, 10, 22)
             btn.BackgroundTransparency = 0.2
-            btn.ZIndex = 5
+            btn.ZIndex = 4
 
             if count == 2 then
                 btn.Size = UDim2.new(0.48, 0, 1, 0)
@@ -398,7 +396,7 @@ function SynapseHub:CreateWindow(Settings)
         frame.BackgroundTransparency = 0.2
         frame.AutoButtonColor = false
         frame.Text = ""
-        frame.ZIndex = 5
+        frame.ZIndex = 4
 
         local corner = Instance.new("UICorner")
         corner.CornerRadius = UDim.new(0, 10)
@@ -420,7 +418,7 @@ function SynapseHub:CreateWindow(Settings)
         label.TextColor3 = Color3.fromRGB(200, 190, 220)
         label.TextSize = 13
         label.TextXAlignment = Enum.TextXAlignment.Left
-        label.ZIndex = 5
+        label.ZIndex = 4
 
         local switch = Instance.new("Frame")
         switch.Parent = frame
@@ -428,7 +426,7 @@ function SynapseHub:CreateWindow(Settings)
         switch.Position = UDim2.new(1, -14, 0.5, 0)
         switch.Size = UDim2.new(0, 40, 0, 20)
         switch.BackgroundColor3 = toggled and Color3.fromRGB(130, 60, 200) or Color3.fromRGB(25, 18, 38)
-        switch.ZIndex = 5
+        switch.ZIndex = 4
 
         local switchCorner = Instance.new("UICorner")
         switchCorner.CornerRadius = UDim.new(1, 0)
@@ -440,7 +438,7 @@ function SynapseHub:CreateWindow(Settings)
         circle.Position = toggled and UDim2.new(1, -18, 0.5, 0) or UDim2.new(0, 2, 0.5, 0)
         circle.Size = UDim2.new(0, 16, 0, 16)
         circle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-        circle.ZIndex = 5
+        circle.ZIndex = 4
 
         local circleCorner = Instance.new("UICorner")
         circleCorner.CornerRadius = UDim.new(1, 0)
@@ -473,7 +471,7 @@ function SynapseHub:CreateWindow(Settings)
         frame.Size = UDim2.new(1, 0, 0, 52)
         frame.BackgroundColor3 = Color3.fromRGB(14, 10, 22)
         frame.BackgroundTransparency = 0.2
-        frame.ZIndex = 5
+        frame.ZIndex = 4
 
         local corner = Instance.new("UICorner")
         corner.CornerRadius = UDim.new(0, 10)
@@ -495,7 +493,7 @@ function SynapseHub:CreateWindow(Settings)
         label.TextColor3 = Color3.fromRGB(200, 190, 220)
         label.TextSize = 13
         label.TextXAlignment = Enum.TextXAlignment.Left
-        label.ZIndex = 5
+        label.ZIndex = 4
 
         local valueLabel = Instance.new("TextLabel")
         valueLabel.Parent = frame
@@ -507,7 +505,7 @@ function SynapseHub:CreateWindow(Settings)
         valueLabel.TextColor3 = Color3.fromRGB(170, 100, 240)
         valueLabel.TextSize = 13
         valueLabel.TextXAlignment = Enum.TextXAlignment.Right
-        valueLabel.ZIndex = 5
+        valueLabel.ZIndex = 4
 
         local sliderBar = Instance.new("TextButton")
         sliderBar.Parent = frame
@@ -516,7 +514,7 @@ function SynapseHub:CreateWindow(Settings)
         sliderBar.BackgroundColor3 = Color3.fromRGB(25, 18, 38)
         sliderBar.AutoButtonColor = false
         sliderBar.Text = ""
-        sliderBar.ZIndex = 5
+        sliderBar.ZIndex = 4
 
         local barCorner = Instance.new("UICorner")
         barCorner.CornerRadius = UDim.new(1, 0)
@@ -526,7 +524,7 @@ function SynapseHub:CreateWindow(Settings)
         sliderFill.Parent = sliderBar
         sliderFill.Size = UDim2.new((Default - Min) / (Max - Min), 0, 1, 0)
         sliderFill.BackgroundColor3 = Color3.fromRGB(130, 60, 200)
-        sliderFill.ZIndex = 5
+        sliderFill.ZIndex = 4
 
         local fillCorner = Instance.new("UICorner")
         fillCorner.CornerRadius = UDim.new(1, 0)
@@ -585,7 +583,7 @@ function SynapseHub:CreateWindow(Settings)
         frame.Size = UDim2.new(1, 0, 0, 52)
         frame.BackgroundColor3 = Color3.fromRGB(14, 10, 22)
         frame.BackgroundTransparency = 0.2
-        frame.ZIndex = 5
+        frame.ZIndex = 4
 
         local corner = Instance.new("UICorner")
         corner.CornerRadius = UDim.new(0, 10)
@@ -607,7 +605,7 @@ function SynapseHub:CreateWindow(Settings)
         label.TextColor3 = Color3.fromRGB(200, 190, 220)
         label.TextSize = 12
         label.TextXAlignment = Enum.TextXAlignment.Left
-        label.ZIndex = 5
+        label.ZIndex = 4
 
         local textBox = Instance.new("TextBox")
         textBox.Parent = frame
@@ -622,7 +620,7 @@ function SynapseHub:CreateWindow(Settings)
         textBox.TextColor3 = Color3.fromRGB(255, 255, 255)
         textBox.TextSize = 12
         textBox.ClearTextOnFocus = false
-        textBox.ZIndex = 5
+        textBox.ZIndex = 4
 
         local boxCorner = Instance.new("UICorner")
         boxCorner.CornerRadius = UDim.new(0, 6)
@@ -660,7 +658,7 @@ function SynapseHub:CreateWindow(Settings)
         labelFrame.Parent = Container
         labelFrame.Size = UDim2.new(1, 0, 0, 28)
         labelFrame.BackgroundTransparency = 1
-        labelFrame.ZIndex = 5
+        labelFrame.ZIndex = 4
 
         local textLabel = Instance.new("TextLabel")
         textLabel.Parent = labelFrame
@@ -672,111 +670,8 @@ function SynapseHub:CreateWindow(Settings)
         textLabel.TextColor3 = Color3.fromRGB(160, 130, 200)
         textLabel.TextSize = 12
         textLabel.TextXAlignment = Enum.TextXAlignment.Left
-        textLabel.ZIndex = 5
+        textLabel.ZIndex = 4
         return labelFrame
-    end
-
-    function WindowElements:CreateSubWindow(SubSettings)
-        SubSettings = SubSettings or {}
-        local SubName = SubSettings.Name or "SUB WINDOW"
-
-        local SubMain = Instance.new("Frame")
-        SubMain.Name = "SubWindow"
-        SubMain.Parent = ScreenGui
-        SubMain.AnchorPoint = Vector2.new(0.5, 0.5)
-        SubMain.Position = UDim2.new(0.5, 140, 0.5, 0)
-        SubMain.Size = UDim2.new(0, 0, 0, 0)
-        SubMain.BackgroundColor3 = Color3.fromRGB(8, 6, 12)
-        SubMain.BackgroundTransparency = 1
-        SubMain.Visible = false
-        SubMain.ZIndex = 10
-
-        local SubCorner = Instance.new("UICorner")
-        SubCorner.CornerRadius = UDim.new(0, 16)
-        SubCorner.Parent = SubMain
-
-        local SubStroke = Instance.new("UIStroke")
-        SubStroke.Parent = SubMain
-        SubStroke.Color = Color3.fromRGB(120, 50, 190)
-        SubStroke.Thickness = 1.4
-
-        local SubHeader = Instance.new("Frame")
-        SubHeader.Name = "SubHeader"
-        SubHeader.Parent = SubMain
-        SubHeader.Size = UDim2.new(1, 0, 0, 44)
-        SubHeader.BackgroundTransparency = 1
-        SubHeader.ZIndex = 11
-
-        local SubTitle = Instance.new("TextLabel")
-        SubTitle.Parent = SubHeader
-        SubTitle.Position = UDim2.new(0, 16, 0.5, -11)
-        SubTitle.Size = UDim2.new(0, 200, 0, 22)
-        SubTitle.BackgroundTransparency = 1
-        SubTitle.Font = Enum.Font.GothamBlack
-        SubTitle.Text = string.upper(SubName)
-        SubTitle.TextColor3 = Color3.fromRGB(235, 225, 250)
-        SubTitle.TextSize = 15
-        SubTitle.TextXAlignment = Enum.TextXAlignment.Left
-
-        local SubClose = Instance.new("TextButton")
-        SubClose.Parent = SubHeader
-        SubClose.Position = UDim2.new(1, -36, 0.5, -11)
-        SubClose.Size = UDim2.new(0, 22, 0, 22)
-        SubClose.BackgroundTransparency = 1
-        SubClose.Font = Enum.Font.ArialBold
-        SubClose.Text = "X"
-        SubClose.TextColor3 = Color3.fromRGB(170, 150, 200)
-        SubClose.TextSize = 13
-        SubClose.ZIndex = 12
-
-        local SubAPI = {}
-
-        function SubAPI:Open()
-            SubMain.Visible = true
-            TweenService:Create(SubMain, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
-                Size = UDim2.new(0, 360, 0, 260),
-                BackgroundTransparency = 0.15
-            }):Play()
-        end
-
-        function SubAPI:Close()
-            TweenService:Create(SubMain, TweenInfo.new(0.2, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
-                Size = UDim2.new(0, 0, 0, 0),
-                BackgroundTransparency = 1
-            }):Play()
-            task.wait(0.2)
-            SubMain.Visible = false
-        end
-
-        function SubAPI:Toggle()
-            if SubMain.Visible then
-                SubAPI:Close()
-            else
-                SubAPI:Open()
-            end
-        end
-
-        SubClose.MouseButton1Click:Connect(function()
-            SubAPI:Close()
-        end)
-
-        local SubContainer = Instance.new("ScrollingFrame")
-        SubContainer.Parent = SubMain
-        SubContainer.BackgroundTransparency = 1
-        SubContainer.Position = UDim2.new(0, 12, 0, 46)
-        SubContainer.Size = UDim2.new(1, -24, 1, -56)
-        SubContainer.ScrollBarThickness = 2
-        SubContainer.ScrollBarImageColor3 = Color3.fromRGB(120, 60, 180)
-        SubContainer.BorderSizePixel = 0
-        SubContainer.AutomaticCanvasSize = Enum.AutomaticSize.Y
-
-        local SubList = Instance.new("UIListLayout")
-        SubList.Parent = SubContainer
-        SubList.SortOrder = Enum.SortOrder.LayoutOrder
-        SubList.Padding = UDim.new(0, 6)
-        SubList.HorizontalAlignment = Enum.HorizontalAlignment.Center
-
-        return SubAPI
     end
 
     return WindowElements
