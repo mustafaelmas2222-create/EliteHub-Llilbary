@@ -1,5 +1,5 @@
 -- ========================================================
--- SYNAPSE HUB - Large Circular Logo Intro & Fluid Library
+-- SYNAPSE HUB - Perfect Circular Logo Intro & Fluid Library
 -- ========================================================
 
 local SynapseHub = {}
@@ -30,7 +30,7 @@ function SynapseHub:CreateWindow(Settings)
     ScreenGui.Parent = CoreGui
     ScreenGui.ResetOnSpawn = false
 
-    -- YENİ POSTIMG LİNKİNİ WORKSPACE'E İNDİRME VE KAYDETME
+    -- GÖRSELİ WORKSPACE'E İNDİRME VE KAYDETME
     local logoAsset = "rbxassetid://6014261993"
     pcall(function()
         local fileName = "synapse_logo.png"
@@ -50,7 +50,7 @@ function SynapseHub:CreateWindow(Settings)
         end
     end)
 
-    -- SİNEMATİK AÇILIŞ (Buğulu Arkaplan ve Büyük, Yuvarlak Logo)[span_3](start_span)[span_3](end_span)
+    -- SİNEMATİK AÇILIŞ (Buğulu Arkaplan ve Tam Daire Maskeli Logo)
     local IntroGui = Instance.new("Frame")
     IntroGui.Name = "IntroGui"
     IntroGui.Parent = ScreenGui
@@ -69,13 +69,13 @@ function SynapseHub:CreateWindow(Settings)
     LogoContainer.Parent = IntroGui
     LogoContainer.AnchorPoint = Vector2.new(0.5, 0.5)
     LogoContainer.Position = UDim2.new(0.5, 0, 0.5, 0)
-    LogoContainer.Size = UDim2.new(0, 190, 0, 190) -- Daha büyük boyut[span_4](start_span)[span_4](end_span)
+    LogoContainer.Size = UDim2.new(0, 190, 0, 190)
     LogoContainer.BackgroundTransparency = 1
     LogoContainer.ClipsDescendants = true
     LogoContainer.ZIndex = 101
 
     local LogoCorner = Instance.new("UICorner")
-    LogoCorner.CornerRadius = UDim.new(1, 0) -- Tam yuvarlak daire maske[span_5](start_span)[span_5](end_span)
+    LogoCorner.CornerRadius = UDim.new(1, 0) -- Tam daire maske
     LogoCorner.Parent = LogoContainer
 
     local LogoImage = Instance.new("ImageLabel")
@@ -84,7 +84,13 @@ function SynapseHub:CreateWindow(Settings)
     LogoImage.Size = UDim2.new(1, 0, 1, 0)
     LogoImage.BackgroundTransparency = 1
     LogoImage.Image = logoAsset
+    LogoImage.ScaleType = Enum.ScaleType.Fit
     LogoImage.ZIndex = 102
+
+    -- Resmin iç kısmına da ekstra daire köşe maskesi (Kare taşmaları önlemek için)
+    local ImageCorner = Instance.new("UICorner")
+    ImageCorner.CornerRadius = UDim.new(1, 0)
+    ImageCorner.Parent = LogoImage
 
     -- ANA MENÜ (Arka planda hazır bekler)
     local Main = Instance.new("Frame")
@@ -206,7 +212,7 @@ function SynapseHub:CreateWindow(Settings)
         ScreenGui:Destroy()
     end)
 
-    -- SİNEMATİK AKIŞ VE KÜÇÜLEREK YOK OLMA SEKANSI[span_6](start_span)[span_6](end_span)
+    -- SİNEMATİK AKIŞ VE KÜÇÜLEREK YOK OLMA SEKANSI
     task.spawn(function()
         task.wait(1.4)
 
