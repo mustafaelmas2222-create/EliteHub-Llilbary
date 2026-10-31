@@ -1,5 +1,5 @@
 -- ========================================================
--- SYNAPSE HUB - Clean Library (No Logo, Custom Button Layout)
+-- SYNAPSE HUB - Big & Chunky Button Layout Library
 -- ========================================================
 
 local SynapseHub = {}
@@ -210,7 +210,7 @@ function SynapseHub:CreateWindow(Settings)
     local UIList = Instance.new("UIListLayout")
     UIList.Parent = Container
     UIList.SortOrder = Enum.SortOrder.LayoutOrder
-    UIList.Padding = UDim.new(0, 8)
+    UIList.Padding = UDim.new(0, 10)
     UIList.HorizontalAlignment = Enum.HorizontalAlignment.Center
 
     local UserFooter = Instance.new("Frame")
@@ -258,56 +258,12 @@ function SynapseHub:CreateWindow(Settings)
 
     local WindowElements = {}
 
-    function WindowElements:CreateButton(Settings)
-        Settings = Settings or {}
-        local btn = Instance.new("TextButton")
-        btn.Parent = Container
-        btn.Size = UDim2.new(1, 0, 0, 40)
-        btn.BackgroundColor3 = Color3.fromRGB(14, 10, 22)
-        btn.BackgroundTransparency = 0.2
-        btn.AutoButtonColor = false
-        btn.Font = Enum.Font.GothamMedium
-        btn.Text = Settings.Name or ""
-        btn.TextColor3 = Color3.fromRGB(200, 190, 220)
-        btn.TextSize = 13
-
-        local corner = Instance.new("UICorner")
-        corner.CornerRadius = UDim.new(0, 10)
-        corner.Parent = btn
-
-        local stroke = Instance.new("UIStroke")
-        stroke.Parent = btn
-        stroke.Color = Color3.fromRGB(45, 25, 70)
-        stroke.Thickness = 1.2
-        stroke.Transparency = 0.4
-
-        btn.MouseEnter:Connect(function()
-            TweenService:Create(btn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(32, 18, 52), TextColor3 = Color3.fromRGB(255, 255, 255)}):Play()
-            TweenService:Create(stroke, TweenInfo.new(0.15), {Color = Color3.fromRGB(130, 60, 200), Transparency = 0}):Play()
-        end)
-
-        btn.MouseLeave:Connect(function()
-            TweenService:Create(btn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(14, 10, 22), TextColor3 = Color3.fromRGB(200, 190, 220)}):Play()
-            TweenService:Create(stroke, TweenInfo.new(0.15), {Color = Color3.fromRGB(45, 25, 70), Transparency = 0.4}):Play()
-        end)
-
-        btn.MouseButton1Down:Connect(function()
-            TweenService:Create(btn, TweenInfo.new(0.08, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Size = UDim2.new(0.96, 0, 0, 36)}):Play()
-        end)
-
-        btn.MouseButton1Up:Connect(function()
-            TweenService:Create(btn, TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Size = UDim2.new(1, 0, 0, 40)}):Play()
-            pcall(Settings.Callback or function() end)
-        end)
-
-        return btn
-    end
-
+    -- 2 TANE BÜYÜK VE TOMBUL BUTON (Üst Kısım İçin Yana Yana)
     function WindowElements:CreateButtonRow(ButtonsData)
         ButtonsData = ButtonsData or {}
         local rowFrame = Instance.new("Frame")
         rowFrame.Parent = Container
-        rowFrame.Size = UDim2.new(1, 0, 0, 40)
+        rowFrame.Size = UDim2.new(1, 0, 0, 56) -- Daha tombul yükseklik
         rowFrame.BackgroundTransparency = 1
 
         local count = #ButtonsData
@@ -315,12 +271,12 @@ function SynapseHub:CreateWindow(Settings)
             local btn = Instance.new("TextButton")
             btn.Parent = rowFrame
             btn.AutoButtonColor = false
-            btn.Font = Enum.Font.GothamMedium
+            btn.Font = Enum.Font.GothamBold
             btn.Text = data.Name or "Buton"
-            btn.TextColor3 = Color3.fromRGB(200, 190, 220)
-            btn.TextSize = 13
-            btn.BackgroundColor3 = Color3.fromRGB(14, 10, 22)
-            btn.BackgroundTransparency = 0.2
+            btn.TextColor3 = Color3.fromRGB(220, 210, 240)
+            btn.TextSize = 14
+            btn.BackgroundColor3 = Color3.fromRGB(16, 11, 26)
+            btn.BackgroundTransparency = 0.15
 
             if count == 2 then
                 btn.Size = UDim2.new(0.48, 0, 1, 0)
@@ -330,23 +286,23 @@ function SynapseHub:CreateWindow(Settings)
             end
 
             local corner = Instance.new("UICorner")
-            corner.CornerRadius = UDim.new(0, 10)
+            corner.CornerRadius = UDim.new(0, 12)
             corner.Parent = btn
 
             local stroke = Instance.new("UIStroke")
             stroke.Parent = btn
-            stroke.Color = Color3.fromRGB(45, 25, 70)
-            stroke.Thickness = 1.2
-            stroke.Transparency = 0.4
+            stroke.Color = Color3.fromRGB(60, 30, 95)
+            stroke.Thickness = 1.4
+            stroke.Transparency = 0.3
 
             btn.MouseEnter:Connect(function()
-                TweenService:Create(btn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(32, 18, 52), TextColor3 = Color3.fromRGB(255, 255, 255)}):Play()
-                TweenService:Create(stroke, TweenInfo.new(0.15), {Color = Color3.fromRGB(130, 60, 200), Transparency = 0}):Play()
+                TweenService:Create(btn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(36, 20, 60), TextColor3 = Color3.fromRGB(255, 255, 255)}):Play()
+                TweenService:Create(stroke, TweenInfo.new(0.15), {Color = Color3.fromRGB(150, 70, 220), Transparency = 0}):Play()
             end)
 
             btn.MouseLeave:Connect(function()
-                TweenService:Create(btn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(14, 10, 22), TextColor3 = Color3.fromRGB(200, 190, 220)}):Play()
-                TweenService:Create(stroke, TweenInfo.new(0.15), {Color = Color3.fromRGB(45, 25, 70), Transparency = 0.4}):Play()
+                TweenService:Create(btn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(16, 11, 26), TextColor3 = Color3.fromRGB(220, 210, 240)}):Play()
+                TweenService:Create(stroke, TweenInfo.new(0.15), {Color = Color3.fromRGB(60, 30, 95), Transparency = 0.3}):Play()
             end)
 
             btn.MouseButton1Down:Connect(function()
@@ -361,12 +317,58 @@ function SynapseHub:CreateWindow(Settings)
         return rowFrame
     end
 
+    -- TÜM MENÜYÜ KAPLAYAN TEK, BÜYÜK VE TOMBUL BUTON (Alt Kısım İçin)
+    function WindowElements:CreateButton(Settings)
+        Settings = Settings or {}
+        local btn = Instance.new("TextButton")
+        btn.Parent = Container
+        btn.Size = UDim2.new(1, 0, 0, 56) -- Tam boy ve tombul yükseklik
+        btn.BackgroundColor3 = Color3.fromRGB(16, 11, 26)
+        btn.BackgroundTransparency = 0.15
+        btn.AutoButtonColor = false
+        btn.Font = Enum.Font.GothamBold
+        btn.Text = Settings.Name or ""
+        btn.TextColor3 = Color3.fromRGB(220, 210, 240)
+        btn.TextSize = 14
+
+        local corner = Instance.new("UICorner")
+        corner.CornerRadius = UDim.new(0, 12)
+        corner.Parent = btn
+
+        local stroke = Instance.new("UIStroke")
+        stroke.Parent = btn
+        stroke.Color = Color3.fromRGB(60, 30, 95)
+        stroke.Thickness = 1.4
+        stroke.Transparency = 0.3
+
+        btn.MouseEnter:Connect(function()
+            TweenService:Create(btn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(36, 20, 60), TextColor3 = Color3.fromRGB(255, 255, 255)}):Play()
+            TweenService:Create(stroke, TweenInfo.new(0.15), {Color = Color3.fromRGB(150, 70, 220), Transparency = 0}):Play()
+        end)
+
+        btn.MouseLeave:Connect(function()
+            TweenService:Create(btn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(16, 11, 26), TextColor3 = Color3.fromRGB(220, 210, 240)}):Play()
+            TweenService:Create(stroke, TweenInfo.new(0.15), {Color = Color3.fromRGB(60, 30, 95), Transparency = 0.3}):Play()
+        end)
+
+        btn.MouseButton1Down:Connect(function()
+            TweenService:Create(btn, TweenInfo.new(0.08, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Size = UDim2.new(0.96, 0, 0, 50)}):Play()
+        end)
+
+        btn.MouseButton1Up:Connect(function()
+            TweenService:Create(btn, TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Size = UDim2.new(1, 0, 0, 56)}):Play()
+            pcall(Settings.Callback or function() end)
+        end)
+
+        return btn
+    end
+
     function WindowElements:CreateToggle(Settings)
         Settings = Settings or {}
         local toggled = Settings.Default or false
         local frame = Instance.new("TextButton")
         frame.Parent = Container
-        frame.Size = UDim2.new(1, 0, 0, 40)
+        frame.Size = UDim2.new(1, 0, 0, 48)
         frame.BackgroundColor3 = Color3.fromRGB(14, 10, 22)
         frame.BackgroundTransparency = 0.2
         frame.AutoButtonColor = false
@@ -416,11 +418,11 @@ function SynapseHub:CreateWindow(Settings)
         circleCorner.Parent = circle
 
         frame.MouseButton1Down:Connect(function()
-            TweenService:Create(frame, TweenInfo.new(0.08), {Size = UDim2.new(0.96, 0, 0, 36)}):Play()
+            TweenService:Create(frame, TweenInfo.new(0.08), {Size = UDim2.new(0.96, 0, 0, 44)}):Play()
         end)
 
         frame.MouseButton1Up:Connect(function()
-            TweenService:Create(frame, TweenInfo.new(0.1), {Size = UDim2.new(1, 0, 0, 40)}):Play()
+            TweenService:Create(frame, TweenInfo.new(0.1), {Size = UDim2.new(1, 0, 0, 48)}):Play()
             toggled = not toggled
             TweenService:Create(switch, TweenInfo.new(0.2), {BackgroundColor3 = toggled and Color3.fromRGB(130, 60, 200) or Color3.fromRGB(25, 18, 38)}):Play()
             TweenService:Create(circle, TweenInfo.new(0.2), {Position = toggled and UDim2.new(1, -18, 0.5, 0) or UDim2.new(0, 2, 0.5, 0)}):Play()
@@ -721,6 +723,7 @@ function SynapseHub:CreateWindow(Settings)
 
         local SubContainer = Instance.new("ScrollingFrame")
         SubContainer.Parent = SubMain
+        SubContainer.BackgroundTransparency = Layer and 1 or 1
         SubContainer.BackgroundTransparency = 1
         SubContainer.Position = UDim2.new(0, 12, 0, 46)
         SubContainer.Size = UDim2.new(1, -24, 1, -56)
