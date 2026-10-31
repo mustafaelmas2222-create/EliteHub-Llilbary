@@ -1,5 +1,5 @@
 -- ========================================================
--- SYNAPSE HUB - Fixed AspectType Library
+-- SYNAPSE HUB - 100% Fully Animated & Fluid UI Library
 -- ========================================================
 
 local SynapseHub = {}
@@ -30,14 +30,14 @@ function SynapseHub:CreateWindow(Settings)
     ScreenGui.Parent = CoreGui
     ScreenGui.ResetOnSpawn = false
 
-    -- GÖRSELİ WORKSPACE'E İNDİRME VE KAYDETME
+    -- ARKA PLANI OLAN ESKİ LİNK YERİNE GÖNDERDİĞİN ŞEFFAF LOGOYU İNDİRME
     local logoAsset = "rbxassetid://6014261993"
     pcall(function()
-        local fileName = "synapse_logo.png"
+        local fileName = "synapse_transparent_logo.png"
         if writefile and readfile and isfile and httpget or game:GetService("HttpService") then
             if not isfile(fileName) then
                 local success, response = pcall(function()
-                    return game:HttpGet("https://i.postimg.cc/9FTRgJWt/file-000000003f6881f4b0a3fec370a63e97.png")
+                    return game:HttpGet("https://i.postimg.cc/tg7Vky7X/531-Photoroom.png")
                 end)
                 if success and response then
                     writefile(fileName, response)
@@ -50,7 +50,7 @@ function SynapseHub:CreateWindow(Settings)
         end
     end)
 
-    -- SİNEMATİK AÇILIŞ (Buğulu Arkaplan ve Kusursuz Daire Logo)
+    -- SİNEMATİK AÇILIŞ (Buğulu Arkaplan ve Şeffaf Logolu Açılış)
     local IntroGui = Instance.new("Frame")
     IntroGui.Name = "IntroGui"
     IntroGui.Parent = ScreenGui
@@ -74,7 +74,6 @@ function SynapseHub:CreateWindow(Settings)
     LogoContainer.ClipsDescendants = true
     LogoContainer.ZIndex = 101
 
-    -- Tam Daire Maske
     local LogoCorner = Instance.new("UICorner")
     LogoCorner.CornerRadius = UDim.new(1, 0)
     LogoCorner.Parent = LogoContainer
@@ -98,13 +97,12 @@ function SynapseHub:CreateWindow(Settings)
     ImageCorner.CornerRadius = UDim.new(1, 0)
     ImageCorner.Parent = LogoImage
 
-    -- ANA MENÜ (Arka planda hazır bekler)
     local Main = Instance.new("Frame")
     Main.Name = "Main"
     Main.Parent = ScreenGui
     Main.AnchorPoint = Vector2.new(0.5, 0.5)
     Main.Position = UDim2.new(0.5, 0, 0.5, 0)
-    Main.Size = UDim2.new(0, 0, 0, 0)
+    Main.Size = UDim2.new(0, 0, 0, 0) -- Başlangıç sıfır (Animasyonlu açılış için)
     Main.BackgroundColor3 = Color3.fromRGB(8, 6, 12)
     Main.BackgroundTransparency = 1
     Main.ClipsDescendants = false
@@ -205,6 +203,7 @@ function SynapseHub:CreateWindow(Settings)
         TweenService:Create(CloseBtn, TweenInfo.new(0.2), {TextColor3 = Color3.fromRGB(170, 150, 200)}):Play()
     end)
 
+    -- KUSURSUZ ANİMASYONLU KAPANIŞ (Küçülerek, şeffaflaşarak yok olma)
     CloseBtn.MouseButton1Click:Connect(function()
         if Lighting:FindFirstChild("SynapseHubBlur") then
             Lighting.SynapseHubBlur:Destroy()
@@ -218,34 +217,7 @@ function SynapseHub:CreateWindow(Settings)
         ScreenGui:Destroy()
     end)
 
-    -- SİNEMATİK AKIŞ VE KÜÇÜLEREK YOK OLMA SEKANSI
-    task.spawn(function()
-        task.wait(1.4)
-
-        TweenService:Create(LogoContainer, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
-            Size = UDim2.new(0, 0, 0, 0),
-            Rotation = 180
-        }):Play()
-        TweenService:Create(LogoImage, TweenInfo.new(0.4), {ImageTransparency = 1}):Play()
-        
-        TweenService:Create(BlurEffect, TweenInfo.new(0.5), {Size = 0}):Play()
-        TweenService:Create(IntroGui, TweenInfo.new(0.5), {BackgroundTransparency = 1}):Play()
-        
-        task.wait(0.5)
-        BlurEffect:Destroy()
-        IntroGui:Destroy()
-
-        -- ANA MENÜYÜ ORTADA AÇ
-        TweenService:Create(Main, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
-            Size = UDim2.new(0, 480, 0, 320),
-            BackgroundTransparency = 0.15
-        }):Play()
-        TweenService:Create(Shadow, TweenInfo.new(0.4), {
-            ImageTransparency = 0.5
-        }):Play()
-    end)
-
-    -- SÜRÜKLEME FİZİĞİ
+    -- AKICI VE KUSURSUZ LERP SÜRÜKLEME FİZİĞİ
     local dragging = false
     local activeTouch = nil
     local dragStart = nil
@@ -359,6 +331,34 @@ function SynapseHub:CreateWindow(Settings)
     StatusText.TextSize = 10
     StatusText.TextXAlignment = Enum.TextXAlignment.Right
 
+    -- SİNEMATİK AÇILIŞ AKIŞI
+    task.spawn(function()
+        task.wait(1.4)
+
+        TweenService:Create(LogoContainer, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
+            Size = UDim2.new(0, 0, 0, 0),
+            Rotation = 180
+        }):Play()
+        TweenService:Create(LogoImage, TweenInfo.new(0.4), {ImageTransparency = 1}):Play()
+        
+        TweenService:Create(BlurEffect, TweenInfo.new(0.5), {Size = 0}):Play()
+        TweenService:Create(IntroGui, TweenInfo.new(0.5), {BackgroundTransparency = 1}):Play()
+        
+        task.wait(0.5)
+        BlurEffect:Destroy()
+        IntroGui:Destroy()
+
+        -- KUSURSUZ ANİMASYONLU AÇILIŞ (Büyüyerek ve netleşerek belirme)
+        TweenService:Create(Main, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+            Size = UDim2.new(0, 480, 0, 320),
+            BackgroundTransparency = 0.15
+        }):Play()
+
+        TweenService:Create(Shadow, TweenInfo.new(0.4), {
+            ImageTransparency = 0.5
+        }):Play()
+    end)
+
     local WindowElements = {}
 
     function WindowElements:CreateButton(Settings)
@@ -404,66 +404,6 @@ function SynapseHub:CreateWindow(Settings)
         end)
 
         return btn
-    end
-
-    function WindowElements:CreateButtonRow(ButtonsData)
-        ButtonsData = ButtonsData or {}
-        
-        local rowFrame = Instance.new("Frame")
-        rowFrame.Parent = Container
-        rowFrame.Size = UDim2.new(1, 0, 0, 40)
-        rowFrame.BackgroundTransparency = 1
-
-        local count = #ButtonsData
-        for i, data in ipairs(ButtonsData) do
-            local btn = Instance.new("TextButton")
-            btn.Parent = rowFrame
-            btn.AutoButtonColor = false
-            btn.Font = Enum.Font.GothamMedium
-            btn.Text = data.Name or "Buton"
-            btn.TextColor3 = Color3.fromRGB(200, 190, 220)
-            btn.TextSize = 13
-            btn.BackgroundColor3 = Color3.fromRGB(14, 10, 22)
-            btn.BackgroundTransparency = 0.2
-
-            if count == 2 then
-                btn.Size = UDim2.new(0.48, 0, 1, 0)
-                btn.Position = UDim2.new((i - 1) * 0.52, 0, 0, 0)
-            else
-                btn.Size = UDim2.new(1, 0, 1, 0)
-            end
-
-            local corner = Instance.new("UICorner")
-            corner.CornerRadius = UDim.new(0, 10)
-            corner.Parent = btn
-
-            local stroke = Instance.new("UIStroke")
-            stroke.Parent = btn
-            stroke.Color = Color3.fromRGB(45, 25, 70)
-            stroke.Thickness = 1.2
-            stroke.Transparency = 0.4
-
-            btn.MouseEnter:Connect(function()
-                TweenService:Create(btn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(32, 18, 52), TextColor3 = Color3.fromRGB(255, 255, 255)}):Play()
-                TweenService:Create(stroke, TweenInfo.new(0.15), {Color = Color3.fromRGB(130, 60, 200), Transparency = 0}):Play()
-            end)
-
-            btn.MouseLeave:Connect(function()
-                TweenService:Create(btn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(14, 10, 22), TextColor3 = Color3.fromRGB(200, 190, 220)}):Play()
-                TweenService:Create(stroke, TweenInfo.new(0.15), {Color = Color3.fromRGB(45, 25, 70), Transparency = 0.4}):Play()
-            end)
-
-            btn.MouseButton1Down:Connect(function()
-                TweenService:Create(btn, TweenInfo.new(0.08, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Size = UDim2.new(btn.Size.X.Scale * 0.95, 0, 0.9, 0)}):Play()
-            end)
-
-            btn.MouseButton1Up:Connect(function()
-                TweenService:Create(btn, TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Size = count == 2 and UDim2.new(0.48, 0, 1, 0) or UDim2.new(1, 0, 1, 0)}):Play()
-                pcall(data.Callback or function() end)
-            end)
-        end
-
-        return rowFrame
     end
 
     function WindowElements:CreateToggle(Settings)
@@ -647,6 +587,7 @@ function SynapseHub:CreateWindow(Settings)
         return frame
     end
 
+    -- TAM ANİMASYONLU TEXTBOX (Yazarken Odaklanma & Boyut Efekti)
     function WindowElements:CreateTextBox(Settings)
         Settings = Settings or {}
         local frame = Instance.new("Frame")
@@ -699,6 +640,7 @@ function SynapseHub:CreateWindow(Settings)
         boxStroke.Color = Color3.fromRGB(130, 60, 200)
         boxStroke.Transparency = 1
 
+        -- Yazı yazmak için tıklandığında (Focus) pürüzsüz animasyon
         textBox.Focused:Connect(function()
             TweenService:Create(textBox, TweenInfo.new(0.2), {
                 BackgroundColor3 = Color3.fromRGB(32, 22, 50),
