@@ -285,7 +285,7 @@ function SynapseHub:CreateWindow(Settings)
         ButtonsData = ButtonsData or {}
         local count = #ButtonsData
         if count == 0 then return end
-        if count > 3 then count = 3 end -- Maksimum 3 buton sınırı
+        if count > 3 then count = 3 end
 
         local rowFrame = Instance.new("Frame")
         rowFrame.Parent = Container
@@ -368,7 +368,7 @@ function SynapseHub:CreateWindow(Settings)
             btn3.BackgroundTransparency = 0.15
 
             applyButtonStyles(btn3)
-            btn3.MouseButton1Click:Connect(function:Connect()
+            btn3.MouseButton1Click:Connect(function()
                 pcall(data3.Callback or function() end)
             end)
         end
@@ -421,7 +421,6 @@ function SynapseHub:CreateWindow(Settings)
         for i, data in ipairs(ButtonsData) do
             local btn = Instance.new("TextButton")
             btn.Parent = groupFrame
-            -- Dikey ikili kolon yapısı ile sonsuz liste
             local isEven = (i % 2 == 0)
             btn.Size = UDim2.new(0.48, 0, 0, 50)
             btn.Position = UDim2.new(isEven and 0.52 or 0, 0, 0, math.floor((i - 1) / 2) * 56)
