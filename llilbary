@@ -1,5 +1,5 @@
 -- ========================================================
--- SYNAPSE HUB - Workspace Logo Loader Library
+-- SYNAPSE HUB - Clean Library (No Logo, Custom Button Layout)
 -- ========================================================
 
 local SynapseHub = {}
@@ -25,26 +25,6 @@ function SynapseHub:CreateWindow(Settings)
     ScreenGui.Name = "SynapseHubLibrary"
     ScreenGui.Parent = CoreGui
     ScreenGui.ResetOnSpawn = false
-
-    -- RESMİ DELTA WORKSPACE KLASÖRÜNE İNDİRME VE OKUMA
-    local logoAsset = "rbxassetid://6014261993" -- Yedek logo
-    pcall(function()
-        local fileName = "synapse_custom_logo.png"
-        if writefile and readfile and isfile and (httpget or game:GetService("HttpService")) then
-            if not isfile(fileName) then
-                local success, response = pcall(function()
-                    return game:HttpGet("https://i.postimg.cc/tg7Vky7X/531-Photoroom.png")
-                end)
-                if success and response then
-                    writefile(fileName, response)
-                end
-            end
-            
-            if isfile(fileName) and getcustomasset then
-                logoAsset = getcustomasset(fileName)
-            end
-        end
-    end)
 
     local Main = Instance.new("Frame")
     Main.Name = "Main"
@@ -113,22 +93,11 @@ function SynapseHub:CreateWindow(Settings)
     Header.BackgroundTransparency = 1
     Header.ZIndex = 3
 
-    -- WORKSPACE'DEN OKUNAN LOGOYU BAŞLIĞIN SOLUNA EKLEME
-    local HeaderLogo = Instance.new("ImageLabel")
-    HeaderLogo.Name = "HeaderLogo"
-    HeaderLogo.Parent = Header
-    HeaderLogo.Position = UDim2.new(0, 14, 0.5, -14)
-    HeaderLogo.Size = UDim2.new(0, 28, 0, 28)
-    HeaderLogo.BackgroundTransparency = 1
-    HeaderLogo.Image = logoAsset
-    HeaderLogo.ScaleType = Enum.ScaleType.Fit
-    HeaderLogo.ZIndex = 4
-
     local Title = Instance.new("TextLabel")
     Title.Name = "Title"
     Title.Parent = Header
-    Title.Position = UDim2.new(0, 50, 0.5, -13)
-    Title.Size = UDim2.new(0, 220, 0, 26)
+    Title.Position = UDim2.new(0, 22, 0.5, -13)
+    Title.Size = UDim2.new(0, 250, 0, 26)
     Title.BackgroundTransparency = 1
     Title.Font = Enum.Font.GothamBlack
     Title.Text = string.upper(WindowName)
