@@ -1,5 +1,5 @@
 -- ========================================================
--- SYNAPSE HUB - Perfect Circular Logo Intro & Fluid Library
+-- SYNAPSE HUB - Final Perfect Circular Logo Intro Library
 -- ========================================================
 
 local SynapseHub = {}
@@ -50,7 +50,7 @@ function SynapseHub:CreateWindow(Settings)
         end
     end)
 
-    -- SİNEMATİK AÇILIŞ (Buğulu Arkaplan ve Tam Daire Maskeli Logo)
+    -- SİNEMATİK AÇILIŞ (Buğulu Arkaplan ve Kusursuz Daire Logo)
     local IntroGui = Instance.new("Frame")
     IntroGui.Name = "IntroGui"
     IntroGui.Parent = ScreenGui
@@ -74,9 +74,16 @@ function SynapseHub:CreateWindow(Settings)
     LogoContainer.ClipsDescendants = true
     LogoContainer.ZIndex = 101
 
+    -- Tam Daire Maske
     local LogoCorner = Instance.new("UICorner")
-    LogoCorner.CornerRadius = UDim.new(1, 0) -- Tam daire maske
+    LogoCorner.CornerRadius = UDim.new(1, 0)
     LogoCorner.Parent = LogoContainer
+
+    local AspectRatio = Instance.new("UIAspectRatioConstraint")
+    AspectRatio.AspectType = Enum.AspectType.FitWithoutParentSizeConstraints
+    AspectRatio.DominantAxis = Enum.DominantAxis.Width
+    AspectRatio.AspectRatio = 1
+    AspectRatio.Parent = LogoContainer
 
     local LogoImage = Instance.new("ImageLabel")
     LogoImage.Name = "LogoImage"
@@ -87,7 +94,6 @@ function SynapseHub:CreateWindow(Settings)
     LogoImage.ScaleType = Enum.ScaleType.Fit
     LogoImage.ZIndex = 102
 
-    -- Resmin iç kısmına da ekstra daire köşe maskesi (Kare taşmaları önlemek için)
     local ImageCorner = Instance.new("UICorner")
     ImageCorner.CornerRadius = UDim.new(1, 0)
     ImageCorner.Parent = LogoImage
