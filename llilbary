@@ -1,5 +1,5 @@
 -- ========================================================
--- SYNAPSE HUB - Clean Header Logo Library (No Intro)
+-- SYNAPSE HUB - Clean Header Logo Library (No Intro & No Blur)
 -- ========================================================
 
 local SynapseHub = {}
@@ -93,7 +93,7 @@ function SynapseHub:CreateWindow(Settings)
     Header.BackgroundTransparency = 1
     Header.ZIndex = 3
 
-    -- LOGO ENTEGRASYONU (Başlığın hemen soluna şık ve şeffaf yerleşim)
+    -- LOGO ENTEGRASYONU (Başlığın hemen solunda şeffaf)
     local HeaderLogo = Instance.new("ImageLabel")
     HeaderLogo.Name = "HeaderLogo"
     HeaderLogo.Parent = Header
@@ -107,7 +107,7 @@ function SynapseHub:CreateWindow(Settings)
     local Title = Instance.new("TextLabel")
     Title.Name = "Title"
     Title.Parent = Header
-    Title.Position = UDim2.new(0, 50, 0.5, -13) -- Logonun sağında boşluk bırakıldı
+    Title.Position = UDim2.new(0, 50, 0.5, -13)
     Title.Size = UDim2.new(0, 220, 0, 26)
     Title.BackgroundTransparency = 1
     Title.Font = Enum.Font.GothamBlack
@@ -267,7 +267,7 @@ function SynapseHub:CreateWindow(Settings)
     StatusText.TextSize = 10
     StatusText.TextXAlignment = Enum.TextXAlignment.Right
 
-    -- DİREK MENÜNÜN AÇILIŞI (Giriş animasyonu yok, direkt ekranda belirir)
+    -- DİREK MENÜNÜN AÇILIŞI (Buğu ve Intro yok, direkt pürüzsüz belirecek)
     TweenService:Create(Main, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
         Size = UDim2.new(0, 480, 0, 320),
         BackgroundTransparency = 0.15
