@@ -1,5 +1,5 @@
 -- ========================================================
--- SYNAPSE HUB - Direct Postimg Intro & Fluid Library
+-- SYNAPSE HUB - Workspace Auto-Download Intro & Fluid Library
 -- ========================================================
 
 local SynapseHub = {}
@@ -30,7 +30,30 @@ function SynapseHub:CreateWindow(Settings)
     ScreenGui.Parent = CoreGui
     ScreenGui.ResetOnSpawn = false
 
-    -- 1. SİNEMATİK AÇILIŞ (Buğulu Arkaplan ve Postimg Logo)
+    -- GÖRSELİ INTERNETTEN İNDİRİP WORKSPACE'E KAYDETME VE OKUMA
+    local logoAsset = "rbxassetid://6014261993" -- Yedek ID
+    pcall(function()
+        local fileName = "synapse_logo.png"
+        if writefile and readfile and isfile and httpget or game:GetService("HttpService") then
+            local HttpService = game:GetService("HttpService")
+            -- Eğer dosya workspace'de yoksa veya güncellenecekse postimg'den indir kaydet
+            if not isfile(fileName) then
+                local success, response = pcall(function()
+                    return game:HttpGet("https://i.postimg.cc/25g0Y0Z5/IMG-20261025-154838-506.jpg")
+                end)
+                if success and response then
+                    writefile(fileName, response)
+                end
+            end
+            
+            -- Workspace'den özel asset olarak yansıt
+            if isfile(fileName) and getcustomasset then
+                logoAsset = getcustomasset(fileName)
+            end
+        end
+    end)
+
+    -- SİNEMATİK AÇILIŞ (Buğulu Arkaplan ve Workspace Logosu)
     local IntroGui = Instance.new("Frame")
     IntroGui.Name = "IntroGui"
     IntroGui.Parent = ScreenGui
@@ -63,11 +86,10 @@ function SynapseHub:CreateWindow(Settings)
     LogoImage.Parent = LogoContainer
     LogoImage.Size = UDim2.new(1, 0, 1, 0)
     LogoImage.BackgroundTransparency = 1
-    -- Doğrudan Postimg linki üzerinden görsel çekimi
-    LogoImage.Image = "https://i.postimg.cc/25g0Y0Z5/IMG-20261025-154838-506.jpg"
+    LogoImage.Image = logoAsset
     LogoImage.ZIndex = 102
 
-    -- ASIL ANA MENÜ
+    -- ANA MENÜ (Arka planda hazır bekler)
     local Main = Instance.new("Frame")
     Main.Name = "Main"
     Main.Parent = ScreenGui
@@ -187,18 +209,16 @@ function SynapseHub:CreateWindow(Settings)
         ScreenGui:Destroy()
     end)
 
-    -- SİNEMATİK AKIŞ VE YUVARLAK KÜÇÜLEREK YOK OLMA
+    -- SİNEMATİK AKIŞ VE KÜÇÜLEREK YOK OLMA SEKANSI
     task.spawn(function()
         task.wait(1.4)
 
-        -- Logoyu yuvarlak maske içinde küçülterek ve döndürerek yok etme
         TweenService:Create(LogoContainer, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
             Size = UDim2.new(0, 0, 0, 0),
             Rotation = 180
         }):Play()
         TweenService:Create(LogoImage, TweenInfo.new(0.4), {ImageTransparency = 1}):Play()
         
-        -- Blur ve karartma perdesini kaldır
         TweenService:Create(BlurEffect, TweenInfo.new(0.5), {Size = 0}):Play()
         TweenService:Create(IntroGui, TweenInfo.new(0.5), {BackgroundTransparency = 1}):Play()
         
@@ -375,6 +395,66 @@ function SynapseHub:CreateWindow(Settings)
         end)
 
         return btn
+    end
+
+    function WindowElements:CreateButtonRow(ButtonsData)
+        ButtonsData = ButtonsData or {}
+        
+        local rowFrame = Instance.new("Frame")
+        rowFrame.Parent = Container
+        rowFrame.Size = UDim2.new(1, 0, 0, 40)
+        rowFrame.BackgroundTransparency = 1
+
+        local count = #ButtonsData
+        for i, data in ipairs(ButtonsData) do
+            local btn = Instance.new("TextButton")
+            btn.Parent = rowFrame
+            btn.AutoButtonColor = false
+            btn.Font = Enum.Font.GothamMedium
+            btn.Text = data.Name or "Buton"
+            btn.TextColor3 = Color3.fromRGB(200, 190, 220)
+            btn.TextSize = 13
+            btn.BackgroundColor3 = Color3.fromRGB(14, 10, 22)
+            btn.BackgroundTransparency = 0.2
+
+            if count == 2 then
+                btn.Size = UDim2.new(0.48, 0, 1, 0)
+                btn.Position = UDim2.new((i - 1) * 0.52, 0, 0, 0)
+            else
+                btn.Size = UDim2.new(1, 0, 1, 0)
+            end
+
+            local corner = Instance.new("UICorner")
+            corner.CornerRadius = UDim.new(0, 10)
+            corner.Parent = btn
+
+            local stroke = Instance.new("UIStroke")
+            stroke.Parent = btn
+            stroke.Color = Color3.fromRGB(45, 25, 70)
+            stroke.Thickness = 1.2
+            stroke.Transparency = 0.4
+
+            btn.MouseEnter:Connect(function()
+                TweenService:Create(btn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(32, 18, 52), TextColor3 = Color3.fromRGB(255, 255, 255)}):Play()
+                TweenService:Create(stroke, TweenInfo.new(0.15), {Color = Color3.fromRGB(130, 60, 200), Transparency = 0}):Play()
+            end)
+
+            btn.MouseLeave:Connect(function()
+                TweenService:Create(btn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(14, 10, 22), TextColor3 = Color3.fromRGB(200, 190, 220)}):Play()
+                TweenService:Create(stroke, TweenInfo.new(0.15), {Color = Color3.fromRGB(45, 25, 70), Transparency = 0.4}):Play()
+            end)
+
+            btn.MouseButton1Down:Connect(function()
+                TweenService:Create(btn, TweenInfo.new(0.08, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Size = UDim2.new(btn.Size.X.Scale * 0.95, 0, 0.9, 0)}):Play()
+            end)
+
+            btn.MouseButton1Up:Connect(function()
+                TweenService:Create(btn, TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Size = count == 2 and UDim2.new(0.48, 0, 1, 0) or UDim2.new(1, 0, 1, 0)}):Play()
+                pcall(data.Callback or function() end)
+            end)
+        end
+
+        return rowFrame
     end
 
     function WindowElements:CreateToggle(Settings)
