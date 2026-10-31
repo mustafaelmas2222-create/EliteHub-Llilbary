@@ -1,5 +1,5 @@
 -- ========================================================
--- SYNAPSE HUB - Multi-Mode UI Library (Chunky & Infinite Modes)
+-- SYNAPSE HUB - Fixed Multi-Mode UI Library
 -- ========================================================
 
 local SynapseHub = {}
@@ -280,7 +280,7 @@ function SynapseHub:CreateWindow(Settings)
         end)
     end
 
-    -- 1. TOMBUL MENÜ (En fazla 3 buton, çizimindeki akıllı yerleşim)
+    -- 1. TOMBUL MENÜ (En fazla 3 buton, boşluksuz ve büyük)
     function WindowElements:CreateChunkyGroup(ButtonsData)
         ButtonsData = ButtonsData or {}
         local count = #ButtonsData
@@ -306,7 +306,9 @@ function SynapseHub:CreateWindow(Settings)
 
             applyButtonStyles(btn)
             btn.MouseButton1Click:Connect(function()
-                pcall(ButtonsData[1].Callback or function() end)
+                if ButtonsData[1].Callback then
+                    pcall(ButtonsData[1].Callback)
+                end
             end)
 
         elseif count == 2 then
@@ -327,7 +329,9 @@ function SynapseHub:CreateWindow(Settings)
 
                 applyButtonStyles(btn)
                 btn.MouseButton1Click:Connect(function()
-                    pcall(data.Callback or function() end)
+                    if data.Callback then
+                        pcall(data.Callback)
+                    end
                 end)
             end
 
@@ -350,7 +354,9 @@ function SynapseHub:CreateWindow(Settings)
 
                 applyButtonStyles(btn)
                 btn.MouseButton1Click:Connect(function()
-                    pcall(data.Callback or function() end)
+                    if data.Callback then
+                        pcall(data.Callback)
+                    end
                 end)
             end
 
@@ -369,14 +375,16 @@ function SynapseHub:CreateWindow(Settings)
 
             applyButtonStyles(btn3)
             btn3.MouseButton1Click:Connect(function()
-                pcall(data3.Callback or function() end)
+                if data3.Callback then
+                    pcall(data3.Callback)
+                end
             end)
         end
 
         return rowFrame
     end
 
-    -- 2. TAM BOYUT MENÜ (Sonsuz Butonlu, Tam Genişlikte Büyük Butonlar)
+    -- 2. TAM BOYUT MENÜ (Sonsuz Butonlu)
     function WindowElements:CreateFullMenu(ButtonsData)
         ButtonsData = ButtonsData or {}
         local groupFrame = Instance.new("Frame")
@@ -403,14 +411,16 @@ function SynapseHub:CreateWindow(Settings)
 
             applyButtonStyles(btn)
             btn.MouseButton1Click:Connect(function()
-                pcall(data.Callback or function() end)
+                if data.Callback then
+                    pcall(data.Callback)
+                end
             end)
         end
 
         return groupFrame
     end
 
-    -- 3. DİKEY MENÜ / SEKMELİ (Sonsuz Butonlu, Yana Yana Kompakt veya Dikey Liste)
+    -- 3. DİKEY MENÜ (Sonsuz Butonlu, İkili Kolon)
     function WindowElements:CreateVerticalMenu(ButtonsData)
         ButtonsData = ButtonsData or {}
         local groupFrame = Instance.new("Frame")
@@ -434,7 +444,9 @@ function SynapseHub:CreateWindow(Settings)
 
             applyButtonStyles(btn)
             btn.MouseButton1Click:Connect(function()
-                pcall(data.Callback or function() end)
+                if data.Callback then
+                    pcall(data.Callback)
+                end
             end)
         end
 
@@ -499,7 +511,9 @@ function SynapseHub:CreateWindow(Settings)
             toggled = not toggled
             TweenService:Create(switch, TweenInfo.new(0.2), {BackgroundColor3 = toggled and Color3.fromRGB(130, 60, 200) or Color3.fromRGB(25, 18, 38)}):Play()
             TweenService:Create(circle, TweenInfo.new(0.2), {Position = toggled and UDim2.new(1, -18, 0.5, 0) or UDim2.new(0, 2, 0.5, 0)}):Play()
-            pcall(Settings.Callback or function() end, toggled)
+            if Settings.Callback then
+                pcall(Settings.Callback, toggled)
+            end
         end)
 
         return frame
